@@ -17,6 +17,53 @@ export default function CustomerDetails() {
   const [error, setError] = useState('');
   const [acting, setActing] = useState(false);
 
+  const [tab, setTab] = useState('local');
+  const [fromDate, setFromDate] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 10); });
+  const [toDate, setToDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [extBills, setExtBills] = useState([]);
+  const [extLoading, setExtLoading] = useState(false);
+  const [extFetched, setExtFetched] = useState(false);
+
+  const fetchExternal = async () => {
+    if (!customer?.external_cucode) return;
+    setExtLoading(true);
+    setExtFetched(true);
+    try {
+      const res = await customersApi.externalBills(id, { from_date: fromDate, to_date: toDate });
+      setExtBills(res.data ?? []);
+    } catch (err) {
+      showToast(err?.response?.data?.message || 'Failed to fetch live bills', 'error');
+    } finally {
+      setExtLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tab === 'external' && customer?.external_cucode && !extFetched) {
+      fetchExternal();
+    }
+  }, [tab, customer, extFetched]);
+
+  const handleExtDownload = async (billno) => {
+    try {
+      showToast('Preparing download...', 'info');
+      const token = localStorage.getItem('leo-token');
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/admin/customers/${id}/external-bills/${billno}/download`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bill_${billno}.pdf`;
+      a.click();
+    } catch (err) {
+      showToast('Failed to download bill', 'error');
+    }
+  };
+
+
   useEffect(() => {
     const loadCustomer = async () => {
       try {
@@ -128,6 +175,13 @@ export default function CustomerDetails() {
         </Card>
       </div>
 
+      
+      <div style={{ padding: '0 1.5rem', marginBottom: '1rem', display: 'flex', gap: '1.5rem', borderBottom: '1px solid var(--border)' }}>
+        <button onClick={() => setTab('local')} style={{ padding: '8px 4px', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600, background: 'none', color: tab === 'local' ? 'var(--blue)' : 'var(--text-secondary)', borderBottom: tab === 'local' ? '2px solid var(--blue)' : '2px solid transparent', marginBottom: -1 }}>Imported Bills</button>
+        <button onClick={() => setTab('external')} style={{ padding: '8px 4px', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600, background: 'none', color: tab === 'external' ? 'var(--blue)' : 'var(--text-secondary)', borderBottom: tab === 'external' ? '2px solid var(--blue)' : '2px solid transparent', marginBottom: -1 }}>Live ERP Bills</button>
+      </div>
+
+      {tab === 'local' && (
       <div style={{ padding: '0 1.5rem' }}>
         <Card>
           <CardHeader title="Bills History" />
@@ -174,6 +228,64 @@ export default function CustomerDetails() {
           </div>
         </Card>
       </div>
+      )}
+
+      {tab === 'external' && (
+      <div style={{ padding: '0 1.5rem' }}>
+        {!customer.external_cucode ? (
+          <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
+            <div style={{ color: 'var(--text-secondary)' }}>Customer is not linked to ERP billing system.</div>
+          </div>
+        ) : (
+          <>
+            <div className="card" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}>From Date</label>
+                <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 13 }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}>To Date</label>
+                <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 13 }} />
+              </div>
+              <button className="btn btn-primary btn-sm" onClick={() => fetchExternal()} disabled={extLoading}>
+                {extLoading ? 'Loading...' : 'Fetch Bills'}
+              </button>
+            </div>
+            {extFetched && (
+            <Card>
+              <CardHeader title={`ERP Bills (${extBills.length})`} />
+              <div className="table-responsive">
+                <table className="table">
+                  <thead>
+                    <tr><th>Bill No.</th><th>Date</th><th>Net Amount</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody>
+                    {extLoading ? (
+                      <tr><td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>Loading...</td></tr>
+                    ) : extBills.length === 0 ? (
+                      <tr><td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>No bills found in this date range.</td></tr>
+                    ) : (
+                      extBills.map((b, i) => (
+                        <tr key={i}>
+                          <td style={{ fontWeight: 500 }}>{b.BN}</td>
+                          <td>{b.DATE}</td>
+                          <td style={{ fontWeight: 600 }}>{fmtAmt(b.NETAMOUNT)}</td>
+                          <td>
+                            <button className="btn btn-secondary btn-sm" onClick={() => handleExtDownload(b.BILLNO)}>Download PDF</button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+            )}
+          </>
+        )}
+      </div>
+      )}
+
     </AppShell>
   );
 }
