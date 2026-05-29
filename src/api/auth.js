@@ -16,4 +16,8 @@ export const authApi = {
   me: async () => {
     return api.get('/auth/me');
   },
+
+  getLogs: async () => {
+    return api.get('/admin/login-logs');
+  },
 };

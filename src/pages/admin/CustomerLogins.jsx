@@ -65,7 +65,7 @@ export default function CustomerLogins() {
       name: user.name,
       phone: user.phone || '',
       email: user.email,
-      external_cucode: user.customer?.external_cucode || '',
+      external_cucode: user.external_cucode || '',
     });
   };
 
@@ -129,7 +129,7 @@ export default function CustomerLogins() {
             <tbody>
               {filtered.map(l => {
                 const av = avColor(l.id);
-                const hasCucode = !!l.customer?.external_cucode;
+                const hasCucode = !!l.external_cucode;
                 return (
                   <tr key={l.id}>
                     <td>
@@ -137,7 +137,7 @@ export default function CustomerLogins() {
                         <div className="cust-av" style={{ background: av.bg, color: av.color }}>{initials(l.name)}</div>
                         <div>
                           <div className="cust-name">{l.name}</div>
-                          <div className="cust-id">{l.customer_code}</div>
+                          <div className="cust-id">{l.external_cucode || 'No Code'}</div>
                         </div>
                       </div>
                     </td>

@@ -66,29 +66,15 @@ export default function Customers() {
   };
 
   useEffect(() => {
-    const init = async () => {
-      // First check how many customers are already in BMS
-      try {
-        const status = await customersApi.syncStatus();
-        const bmsCount = status.data?.bms_customers ?? 0;
-
-        if (bmsCount === 0 && !hasSynced.current) {
-          // No customers at all — auto-sync silently then show them
-          hasSynced.current = true;
-          await runSync(false);
-        } else {
-          await fetchCustomers();
-        }
-      } catch {
-        await fetchCustomers();
-      }
-    };
-    init();
+    // Load customers directly from DB — no ERP call on page load.
+    // Use the Sync button to pull fresh data from the billing system.
+    fetchCustomers();
   }, []);
+
 
   const filtered = customers.filter(c => {
     const matchSearch = c.name?.toLowerCase().includes(search.toLowerCase()) ||
-                        c.customer_code?.toLowerCase().includes(search.toLowerCase());
+                        c.external_cucode?.toLowerCase().includes(search.toLowerCase());
     const outstandingNum = Number(c.outstanding_amount ?? 0);
     const matchFilter =
       filter === 'all' ||
@@ -209,7 +195,7 @@ export default function Customers() {
                         <div className="cust-av" style={{ background: av.bg, color: av.color }}>{initials(c.name)}</div>
                         <div>
                           <div className="cust-name">{c.name}</div>
-                          <div className="cust-id">{c.customer_code}</div>
+                          <div className="cust-id">{c.external_cucode || 'No Code'}</div>
                         </div>
                       </div>
                     </td>

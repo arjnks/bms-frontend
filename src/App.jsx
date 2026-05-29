@@ -16,6 +16,7 @@ const Login = lazy(() => import('./pages/Login'));
 // Admin
 const Overview            = lazy(() => import('./pages/admin/Overview'));
 const Customers           = lazy(() => import('./pages/admin/Customers'));
+const CustomerDetails     = lazy(() => import('./pages/admin/CustomerDetails'));
 const BillUpload          = lazy(() => import('./pages/admin/BillUpload'));
 const PaymentVerifications = lazy(() => import('./pages/admin/PaymentVerifications'));
 const UserApprovals       = lazy(() => import('./pages/admin/UserApprovals'));
@@ -24,6 +25,7 @@ const AddRule             = lazy(() => import('./pages/admin/AddRule'));
 const Reports             = lazy(() => import('./pages/admin/Reports'));
 const AdminBills          = lazy(() => import('./pages/admin/AdminBills'));
 const CustomerLogins      = lazy(() => import('./pages/admin/CustomerLogins'));
+const SecurityLogs        = lazy(() => import('./pages/admin/SecurityLogs'));
 
 // Customer
 const MyBills           = lazy(() => import('./pages/customer/MyBills'));
@@ -50,10 +52,11 @@ export default function App() {
                 <Route element={<ProtectedRoute allowedRole="admin" />}>
                   <Route path="/dashboard"                  element={<Overview />} />
                   <Route path="/dashboard/customers"        element={<Customers />} />
-                  <Route path="/dashboard/customers/:id"    element={<Customers />} />
+                  <Route path="/dashboard/customers/:id"    element={<CustomerDetails />} />
                   <Route path="/dashboard/bills/upload"     element={<BillUpload />} />
                   <Route path="/dashboard/bills"            element={<AdminBills />} />
                   <Route path="/dashboard/logins"           element={<CustomerLogins />} />
+                  <Route path="/dashboard/security-logs"    element={<SecurityLogs />} />
                   <Route path="/dashboard/payments"         element={<PaymentVerifications />} />
                   <Route path="/dashboard/approvals"        element={<UserApprovals />} />
                   <Route path="/dashboard/reminders"        element={<Reminders />} />
