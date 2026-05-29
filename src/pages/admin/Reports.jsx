@@ -21,7 +21,7 @@ export default function Reports() {
       reportsApi.aging(),
       reportsApi.collections(),
       reportsApi.overview(),
-      billsApi.adminList({ payment_status: 'unpaid' })
+      billsApi.adminList({ is_overdue: true })
     ]).then(([agingRes, collRes, overRes, billsRes]) => {
       setAging(agingRes.data || agingRes);
       setCollections(collRes.data || collRes);
