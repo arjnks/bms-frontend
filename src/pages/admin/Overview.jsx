@@ -70,7 +70,7 @@ export default function Overview() {
 
       {/* KPIs */}
       <div className="kpi-grid">
-        <KpiCard variant="red" value={formatCurrency(data.total_outstanding)} label="Total Outstanding" change="Live Data" changeType="dn"
+        <KpiCard variant="red" value={formatCurrency(data.total_outstanding)} label="Dues This Month" change="Live Data" changeType="dn"
           icon={<svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>} />
         <KpiCard variant="blue" value={data.bills_today.toString()} label="Bills Sent Today" change="Live Data" changeType="up"
           icon={<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>} />
