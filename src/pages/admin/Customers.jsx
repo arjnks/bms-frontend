@@ -206,7 +206,14 @@ export default function Customers() {
                         {c.preferred_bill_format || 'excel'}
                       </span>
                     </td>
-                    <td><StatusBadge status={outstanding > 0 ? 'overdue' : 'paid'} /></td>
+                    <td>
+                      <StatusBadge 
+                        status={
+                          outstanding === 0 ? 'paid' 
+                          : (c.nearest_due_date && new Date(c.nearest_due_date) < new Date() ? 'overdue' : 'unpaid')
+                        } 
+                      />
+                    </td>
                     <td>
                       <div className="act-btns">
                         <button className={`btn-xs${outstanding > 0 ? ' danger' : ''}`}
