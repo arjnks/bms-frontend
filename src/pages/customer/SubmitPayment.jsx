@@ -60,6 +60,27 @@ export default function SubmitPayment() {
   const amtLabel     = bill ? fmtAmt(bill.grand_total) : '…';
   const dueLabel     = bill?.due_date ?? '-';
 
+  if (!billLoading && !bill) {
+    return (
+      <div className="pg-wrap">
+        <Navbar />
+        <Sidebar />
+        <main className="pg-main">
+          <div className="breadcrumb">
+            <span className="breadcrumb-item" onClick={() => navigate('/portal')}>Portal</span>
+            <span className="breadcrumb-sep">›</span>
+            <span>Submit Payment</span>
+          </div>
+
+          <div className="pg-hdr">
+            <div><div className="pg-title">Bill Not Found</div><div className="pg-sub">The payment link has expired or the bill does not exist.</div></div>
+          </div>
+          <button className="btn btn-secondary" onClick={() => navigate('/portal')}>Return to Dashboard</button>
+        </main>
+      </div>
+    );
+  }
+
   if (submitted) {
     return (
       <>
