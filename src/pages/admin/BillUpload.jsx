@@ -151,7 +151,7 @@ export default function BillUpload() {
                       <span>📧 {selectedCustomer.email}</span>
                       <span>📄 Prefers: <strong>{selectedCustomer.preferred_bill_format?.toUpperCase()}</strong></span>
                       {selectedCustomer.outstanding_amount > 0 && (
-                        <span style={{ color: 'var(--red)' }}>⚠ Outstanding: ₹{Number(selectedCustomer.outstanding_amount).toLocaleString('en-IN')}</span>
+                        <span style={{ color: 'var(--red)' }}>⚠ Outstanding: Rs. {Number(selectedCustomer.outstanding_amount).toLocaleString('en-IN')}</span>
                       )}
                     </div>
                   )}
@@ -174,13 +174,13 @@ export default function BillUpload() {
                   </div>
                   {mode === 'upload' && (
                     <div className="form-group">
-                      <label className="form-label">Subtotal (₹)</label>
+                      <label className="form-label">Subtotal (Rs. )</label>
                       <input className="form-ctrl" type="number" placeholder="0.00" value={subtotal} onChange={e => setSubtotal(e.target.value)} />
                     </div>
                   )}
                   {mode === 'upload' && (
                     <div className="form-group">
-                      <label className="form-label">GST total (₹)</label>
+                      <label className="form-label">GST total (Rs. )</label>
                       <input className="form-ctrl" type="number" placeholder="0.00" value={gstTotal} onChange={e => setGstTotal(e.target.value)} />
                     </div>
                   )}
@@ -224,7 +224,7 @@ export default function BillUpload() {
                     <thead>
                       <tr>
                         <th>Product name</th><th>HSN</th><th>Qty</th><th>Unit</th>
-                        <th>Rate (₹)</th><th>GST %</th><th>Total</th><th></th>
+                        <th>Rate (Rs. )</th><th>GST %</th><th>Total</th><th></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -244,7 +244,7 @@ export default function BillUpload() {
                               <option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option>
                             </select>
                           </td>
-                          <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>₹{lineTotal(l).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                          <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>Rs. {lineTotal(l).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                           <td>{lineItems.length > 1 && <button type="button" className="btn-xs danger" onClick={() => removeLine(i)}>✕</button>}</td>
                         </tr>
                       ))}
@@ -253,7 +253,7 @@ export default function BillUpload() {
                 </div>
                 <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', textAlign: 'right' }}>
                   <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>
-                    Grand Total: ₹{grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    Grand Total: Rs. {grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </Card>

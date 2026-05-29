@@ -124,9 +124,9 @@ export default function BillDetail() {
                         <td style={{ fontWeight: 500 }}>{l.product_name}</td>
                         <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{l.hsn_code}</td>
                         <td>{l.quantity} {l.unit}</td>
-                        <td>₹{Number(l.unit_price).toLocaleString('en-IN')}</td>
+                        <td>Rs. {Number(l.unit_price).toLocaleString('en-IN')}</td>
                         <td><span className="badge b-blue">{l.gst_percentage}%</span></td>
-                        <td style={{ fontWeight: 600 }}>₹{t.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                        <td style={{ fontWeight: 600 }}>Rs. {t.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                       </tr>
                     );
                   })}
@@ -136,15 +136,15 @@ export default function BillDetail() {
               <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
                 <div style={{ display: 'flex', gap: 48, fontSize: 13 }}>
                   <span style={{ color: 'var(--text-2)' }}>Subtotal</span>
-                  <span style={{ fontWeight: 600 }}>₹{subtotal.toLocaleString('en-IN')}</span>
+                  <span style={{ fontWeight: 600 }}>Rs. {subtotal.toLocaleString('en-IN')}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 48, fontSize: 13 }}>
                   <span style={{ color: 'var(--text-2)' }}>GST total</span>
-                  <span style={{ fontWeight: 600 }}>₹{gstTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                  <span style={{ fontWeight: 600 }}>Rs. {gstTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 48, fontSize: 16, fontWeight: 700, color: 'var(--text)', borderTop: '1px solid var(--border)', paddingTop: 8, marginTop: 4 }}>
                   <span>Grand Total</span>
-                  <span>₹{grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                  <span>Rs. {grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                 </div>
               </div>
             </Card>
@@ -161,7 +161,7 @@ export default function BillDetail() {
                   ['Bill date', bill.bill_date],
                   ['Due date', bill.due_date],
                   ['Total items', bill.lineItems?.length || 0],
-                  ['Grand total', `₹${grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`],
+                  ['Grand total', `Rs. ${grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`],
                 ].map(([k, v]) => (
                   <div key={k} className="setting-row">
                     <span className="setting-lbl" style={{ fontWeight: 500 }}>{k}</span>

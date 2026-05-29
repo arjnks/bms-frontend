@@ -6,7 +6,7 @@ import { StatusBadge } from '../../components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import { customersApi } from '../../api/customers';
 
-const fmtAmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`;
+const fmtAmt = (n) => `Rs. ${Number(n).toLocaleString('en-IN')}`;
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
 export default function CustomerDetails() {

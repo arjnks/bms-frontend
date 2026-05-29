@@ -6,7 +6,7 @@ import { StatusBadge } from '../../components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import { billsApi } from '../../api/bills';
 
-const fmtAmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`;
+const fmtAmt = (n) => `Rs. ${Number(n).toLocaleString('en-IN')}`;
 
 export default function AdminBills() {
   const navigate = useNavigate();

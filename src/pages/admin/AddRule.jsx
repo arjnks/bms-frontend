@@ -13,10 +13,10 @@ const TRIGGERS = [
 ];
 
 const PREVIEW = {
-  before_due: `Dear {{customer_name}},\n\nThis is a friendly reminder that invoice {{invoice_no}} for ₹{{amount}} is due on {{due_date}}.\n\nPlease ensure timely payment to avoid disruption.\n\n— Leo Group`,
-  on_due: `Dear {{customer_name}},\n\nYour payment of ₹{{amount}} for invoice {{invoice_no}} is due TODAY.\n\nPlease clear your dues immediately.\n\n— Leo Group`,
-  after_due: `Dear {{customer_name}},\n\nYour invoice {{invoice_no}} for ₹{{amount}} is now OVERDUE (due: {{due_date}}).\n\nPlease pay urgently or contact us.\n\n— Leo Group`,
-  weekly_overdue: `Dear {{customer_name}},\n\nWeekly reminder: You have an outstanding balance of ₹{{amount}} on invoice {{invoice_no}}.\n\nPlease settle at the earliest.\n\n— Leo Group`,
+  before_due: `Dear {{customer_name}},\n\nThis is a friendly reminder that invoice {{invoice_no}} for Rs. {{amount}} is due on {{due_date}}.\n\nPlease ensure timely payment to avoid disruption.\n\n— Leo Group`,
+  on_due: `Dear {{customer_name}},\n\nYour payment of Rs. {{amount}} for invoice {{invoice_no}} is due TODAY.\n\nPlease clear your dues immediately.\n\n— Leo Group`,
+  after_due: `Dear {{customer_name}},\n\nYour invoice {{invoice_no}} for Rs. {{amount}} is now OVERDUE (due: {{due_date}}).\n\nPlease pay urgently or contact us.\n\n— Leo Group`,
+  weekly_overdue: `Dear {{customer_name}},\n\nWeekly reminder: You have an outstanding balance of Rs. {{amount}} on invoice {{invoice_no}}.\n\nPlease settle at the earliest.\n\n— Leo Group`,
 };
 
 export default function AddRule() {

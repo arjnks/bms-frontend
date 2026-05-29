@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const fmt = (v) => `₹${(v / 100000).toFixed(1)}L`;
+const fmt = (v) => `Rs. ${(v / 100000).toFixed(1)}L`;
 
 export function CollectionsChart({ data = [] }) {
   return (
@@ -10,7 +10,7 @@ export function CollectionsChart({ data = [] }) {
         <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-2)' }} axisLine={false} tickLine={false} />
         <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: 'var(--text-2)' }} axisLine={false} tickLine={false} />
         <Tooltip
-          formatter={(v) => [`₹${v.toLocaleString('en-IN')}`, 'Collected']}
+          formatter={(v) => [`Rs. ${v.toLocaleString('en-IN')}`, 'Collected']}
           contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
           cursor={{ fill: 'var(--blue-light)' }}
         />

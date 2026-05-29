@@ -5,7 +5,7 @@ import { Card, CardHeader } from '../../components/ui/Card';
 import { reportsApi } from '../../api/reports';
 import { billsApi } from '../../api/bills';
 
-const fmt = (v) => `₹${(v / 100000).toFixed(1)}L`;
+const fmt = (v) => `Rs. ${(v / 100000).toFixed(1)}L`;
 const formatCurrency = (amt) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amt);
 
 export default function Reports() {
@@ -105,7 +105,7 @@ export default function Reports() {
       <div className="reports-charts">
         <div className="chart-card">
           <div className="chart-hdr">
-            <div><div className="chart-title">Monthly Collections</div><div className="chart-sub">₹ Collected — last 12 months</div></div>
+            <div><div className="chart-title">Monthly Collections</div><div className="chart-sub">Rs.  Collected — last 12 months</div></div>
           </div>
           <div className="chart-wrap">
             <ResponsiveContainer width="100%" height="100%">

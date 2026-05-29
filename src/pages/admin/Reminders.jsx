@@ -129,7 +129,7 @@ export default function Reminders() {
               <div><div className="setting-lbl">Trigger threshold</div><div className="setting-hint">Show popup if outstanding ≥ this amount</div></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <input className="ctrl" type="number" value={threshold} onChange={e => setThreshold(e.target.value)} style={{ width: 100 }} />
-                <span style={{ fontSize: 13, color: 'var(--text-2)' }}>₹</span>
+                <span style={{ fontSize: 13, color: 'var(--text-2)' }}>Rs. </span>
               </div>
             </div>
             <div className="setting-row">

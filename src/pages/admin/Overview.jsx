@@ -84,7 +84,7 @@ export default function Overview() {
       <div className="charts-row">
         <div className="chart-card">
           <div className="chart-hdr">
-            <div><div className="chart-title">Monthly Collections</div><div className="chart-sub">₹ collected per month</div></div>
+            <div><div className="chart-title">Monthly Collections</div><div className="chart-sub">Rs.  collected per month</div></div>
             <select className="ctrl" style={{ fontSize: 12, padding: '5px 10px', borderRadius: 8 }}>
               <option>Last 12 months</option>
             </select>

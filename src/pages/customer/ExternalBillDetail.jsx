@@ -7,7 +7,7 @@ import { showToast } from '../../components/ui/Toast';
 import { billsApi } from '../../api/bills';
 import { useAuth } from '../../context/AuthContext';
 
-const fmtCurrency = (n) => `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmtCurrency = (n) => `Rs. ${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export default function ExternalBillDetail() {
   const { billno } = useParams();

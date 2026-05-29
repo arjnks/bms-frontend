@@ -8,8 +8,8 @@ import { useAuth } from '../../context/AuthContext';
 import { showToast } from '../../components/ui/Toast';
 import { billsApi } from '../../api/bills';
 
-const fmtAmt = (n) => `â‚¹${Number(n).toLocaleString('en-IN')}`;
-const fmtAmt2 = (n) => `â‚¹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmtAmt = (n) => `Rs. ${Number(n).toLocaleString('en-IN')}`;
+const fmtAmt2 = (n) => `Rs. ${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const today = () => new Date().toISOString().slice(0, 10);
 const firstOfMonth = () => { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 10); };
 
@@ -122,7 +122,7 @@ export default function MyBills() {
 
   return (
     <>
-      <Navbar outstandingAmt={outstanding > 0 ? fmtAmt(outstanding).replace('â‚¹', '') : null} />
+      <Navbar outstandingAmt={outstanding > 0 ? fmtAmt(outstanding).replace('Rs. ', '') : null} />
       <Sidebar />
       <main className="main-content">
         <div className="pg-hdr">

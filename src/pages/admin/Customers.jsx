@@ -6,7 +6,7 @@ import { StatusBadge } from '../../components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import { customersApi } from '../../api/customers';
 
-const fmtAmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`;
+const fmtAmt = (n) => `Rs. ${Number(n).toLocaleString('en-IN')}`;
 const initials = (name) => name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() ?? '??';
 const AV_COLORS = [
   { bg: '#fdf2f2', color: '#c0392b' }, { bg: '#fef9ec', color: '#b45309' },

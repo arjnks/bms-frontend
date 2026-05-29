@@ -21,7 +21,7 @@ export function Navbar({ outstandingAmt }) {
       </div>
       <div className="nav-right">
         {outstandingAmt && (
-          <span className="outstanding-badge">₹{outstandingAmt} outstanding</span>
+          <span className="outstanding-badge">Rs. {outstandingAmt} outstanding</span>
         )}
         <button className="nav-btn" title="Notifications" aria-label="Notifications">
           <svg viewBox="0 0 24 24">
