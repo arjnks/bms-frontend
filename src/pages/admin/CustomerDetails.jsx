@@ -5,6 +5,7 @@ import { Card, CardHeader } from '../../components/ui/Card';
 import { StatusBadge } from '../../components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
 import { customersApi } from '../../api/customers';
+import api from '../../api/axios';
 
 const fmtAmt = (n) => `Rs. ${Number(n).toLocaleString('en-IN')}`;
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -47,18 +48,19 @@ export default function CustomerDetails() {
   const handleExtDownload = async (billno) => {
     try {
       showToast('Preparing download...', 'info');
-      const token = localStorage.getItem('leo-token');
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/admin/customers/${id}/external-bills/${billno}/download`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const response = await api.get(`/admin/customers/${id}/external-bills/${billno}/download`, {
+        responseType: 'blob'
       });
-      if (!response.ok) throw new Error('Download failed');
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       const a = document.createElement('a');
       a.href = url;
       a.download = `bill_${billno}.pdf`;
+      document.body.appendChild(a);
       a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
     } catch (err) {
+      console.error(err);
       showToast('Failed to download bill', 'error');
     }
   };
