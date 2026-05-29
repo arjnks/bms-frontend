@@ -176,7 +176,7 @@ export default function UserApprovals() {
           </div>
           <div className="popup-body">
             <div className="form-group">
-              <label className="form-label">Reason (optional — sent to user)</label>
+              <label className="form-label">Reason (optional - sent to user)</label>
               <textarea className="form-ctrl" rows={3} placeholder="e.g. Incomplete details provided…"
                 value={reason} onChange={e => setReason(e.target.value)} />
             </div>

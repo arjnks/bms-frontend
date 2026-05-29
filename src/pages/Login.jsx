@@ -137,7 +137,7 @@ export default function Login() {
               {regStep === 2 && (
                 <form onSubmit={handleRegister} noValidate>
                   <div className="f-title">Your details</div>
-                  <div className="f-sub">Fill in your info — admin will verify and approve your account</div>
+                  <div className="f-sub">Fill in your info - admin will verify and approve your account</div>
                   <div className="mf-row2">
                     <div className="mf-group">
                       <label className="mf-label">Full Name</label>

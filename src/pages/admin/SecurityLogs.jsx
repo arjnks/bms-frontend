@@ -69,9 +69,9 @@ export default function SecurityLogs() {
                       <tr key={log.id}>
                         <td style={{ whiteSpace: 'nowrap' }}>{fmtDate(log.created_at)}</td>
                         <td style={{ fontWeight: 500 }}>{log.email}</td>
-                        <td>{log.ip_address || '—'}</td>
+                        <td>{log.ip_address || '-'}</td>
                         <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.user_agent}>
-                          {log.user_agent || '—'}
+                          {log.user_agent || '-'}
                         </td>
                         <td>
                           <StatusBadge 

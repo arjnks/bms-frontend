@@ -27,7 +27,7 @@ export default function Preferences() {
     setSaving(true);
     try {
       await api.patch('/customer/preferences', { preferred_bill_format: format });
-      showToast(`✓ Preference saved — bills will be sent as ${format.toUpperCase()}`);
+      showToast(`✓ Preference saved - bills will be sent as ${format.toUpperCase()}`);
     } catch (err) {
       showToast(err?.message || 'Failed to save preference', 'error');
     } finally {
@@ -53,7 +53,7 @@ export default function Preferences() {
             <div style={{ padding: '1.25rem 1.5rem' }}>
               <p style={{ fontSize: 13, color: 'var(--text-2)', marginBottom: '1.25rem', lineHeight: 1.6 }}>
                 Choose the file format you'd like to receive your bills in.
-                Only this format will be generated and sent to you — saving storage and keeping things simple.
+                Only this format will be generated and sent to you - saving storage and keeping things simple.
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: '1.5rem' }}>
@@ -145,7 +145,7 @@ export default function Preferences() {
                 borderRadius: 'var(--radius)', padding: '.75rem 1rem',
                 fontSize: 12.5, color: '#1e40af', lineHeight: 1.6, marginBottom: '1.25rem',
               }}>
-                💡 This preference is saved to your account. Your admin will automatically generate bills in this format for you — no need to convert files manually.
+                💡 This preference is saved to your account. Your admin will automatically generate bills in this format for you - no need to convert files manually.
               </div>
 
               <button

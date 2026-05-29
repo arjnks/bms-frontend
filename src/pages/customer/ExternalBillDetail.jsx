@@ -34,7 +34,7 @@ export default function ExternalBillDetail() {
     setDownloading(true);
     const token = localStorage.getItem('token');
     const url = billsApi.externalDownloadUrl(billno);
-    // Open with auth header — create a temporary anchor with token-authenticated fetch
+    // Open with auth header - create a temporary anchor with token-authenticated fetch
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => {
         if (!res.ok) throw new Error('Download failed');

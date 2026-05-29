@@ -68,7 +68,7 @@ export default function MyBills() {
     }
   }, [loading, bills]);
 
-  // Fetch external bills — called automatically on tab switch
+  // Fetch external bills - called automatically on tab switch
   const fetchExternal = async (from, to) => {
     if (!hasCucode) return;
     setExtLoading(true);
@@ -128,7 +128,7 @@ export default function MyBills() {
         <div className="pg-hdr">
           <div>
             <div className="pg-title">My Bills</div>
-            <div className="pg-sub">{user?.name} â€” Customer ID: {user?.customer?.customer_code || 'N/A'}</div>
+            <div className="pg-sub">{user?.name} - Customer ID: {user?.customer?.customer_code || 'N/A'}</div>
           </div>
           {outstanding > 0 && <span className="outstanding-badge">{fmtAmt(outstanding)} outstanding</span>}
         </div>
@@ -141,7 +141,7 @@ export default function MyBills() {
           <div className="metric">
             <div className="metric-label">Last paid</div>
             <div className="metric-val" style={{ fontSize: 20 }}>
-              {lastPaid ? new Date(lastPaid.updated_at).toLocaleDateString('en-IN') : 'â€”'}
+              {lastPaid ? new Date(lastPaid.updated_at).toLocaleDateString('en-IN') : '-'}
             </div>
           </div>
         </div>
@@ -161,7 +161,7 @@ export default function MyBills() {
           ))}
         </div>
 
-        {/* ———————————————————————————————————————————————————————————————————————————— */}
+        {/* ---------------------------------------------------------------------------- */}
         {tab === 'manual' && (
           <div className="card">
             <div className="card-hdr">
@@ -220,7 +220,7 @@ export default function MyBills() {
           </div>
         )}
 
-        {/* ———————————————————————————————————————————————————————————————————————————— */}
+        {/* ---------------------------------------------------------------------------- */}
         {tab === 'external' && (
           <div>
             {!hasCucode ? (

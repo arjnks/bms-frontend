@@ -45,7 +45,7 @@ export function Navbar({ outstandingAmt }) {
             </svg>
           )}
         </button>
-        <div className="avatar-nav" onClick={logout} title={`${user?.name} — click to logout`}>
+        <div className="avatar-nav" onClick={logout} title={`${user?.name} - click to logout`}>
           {initials}
         </div>
       </div>

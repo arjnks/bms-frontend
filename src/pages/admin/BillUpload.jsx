@@ -138,7 +138,7 @@ export default function BillUpload() {
                       onChange={e => handleCustomerChange(e.target.value)}
                       required
                     >
-                      <option value="">— Select a customer —</option>
+                      <option value="">- Select a customer -</option>
                       {customers.map(c => (
                         <option key={c.id} value={c.id}>
                           {c.name} ({c.customer_code}) · {c.preferred_bill_format?.toUpperCase()}

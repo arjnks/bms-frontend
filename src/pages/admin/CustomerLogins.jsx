@@ -143,7 +143,7 @@ export default function CustomerLogins() {
                     </td>
                     <td style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--blue)' }}>{l.email}</td>
                     <td style={{ fontSize: 13, color: 'var(--text-2)' }}>
-                      {l.phone || <span style={{ color: 'var(--gray-2)', fontStyle: 'italic' }}>—</span>}
+                      {l.phone || <span style={{ color: 'var(--gray-2)', fontStyle: 'italic' }}>-</span>}
                     </td>
                     <td>
                       {hasCucode

@@ -52,7 +52,7 @@ export default function PaymentVerifications() {
     try {
       await billsApi.rejectPayment(selected.id, rejectReason);
       setPending(ps => ps.filter(x => x.id !== selected.id));
-      showToast(`Payment proof rejected — ${selected.customer_name} will be notified`, 'error');
+      showToast(`Payment proof rejected - ${selected.customer_name} will be notified`, 'error');
       setSelected(null); setRejectModal(false); setRejectReason('');
     } catch (err) {
       showToast(err?.message || 'Failed to reject payment', 'error');
@@ -105,11 +105,11 @@ export default function PaymentVerifications() {
                   </td>
                   <td className="amt-green" style={{ fontWeight: 600 }}>{formatCurrency(p.grand_total)}</td>
                   <td><span className={`ch-tag ${p.payment_method === 'gpay' ? 'ch-wa' : 'ch-sms'}`}>
-                    {p.payment_method === 'gpay' ? 'GPay' : p.payment_method === 'neft' ? 'NEFT' : p.payment_method || '—'}
+                    {p.payment_method === 'gpay' ? 'GPay' : p.payment_method === 'neft' ? 'NEFT' : p.payment_method || '-'}
                   </span></td>
-                  <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{p.utr_number || '—'}</td>
+                  <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{p.utr_number || '-'}</td>
                   <td style={{ fontSize: 12, color: 'var(--text-2)' }}>
-                    {p.payment_submitted_at ? fmtDateTime(p.payment_submitted_at) : '—'}
+                    {p.payment_submitted_at ? fmtDateTime(p.payment_submitted_at) : '-'}
                   </td>
                   <td>
                     <div className="act-btns">
@@ -135,14 +135,14 @@ export default function PaymentVerifications() {
           <div className="popup" style={{ width: 500 }}>
             <div className="popup-hdr" style={{ background: 'linear-gradient(135deg, #166534, #1a56db)' }}>
               <div className="popup-ico"><svg viewBox="0 0 24 24" width="22" height="22" stroke="#fff" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
-              <div><div className="popup-htitle">Payment Proof — {selected.invoice_no}</div><div className="popup-hsub">{selected.customer_name}</div></div>
+              <div><div className="popup-htitle">Payment Proof - {selected.invoice_no}</div><div className="popup-hsub">{selected.customer_name}</div></div>
             </div>
             <div className="popup-body">
               <div className="popup-amt-row"><div className="popup-amt" style={{ color: '#166534' }}>{formatCurrency(selected.grand_total)}</div><div className="popup-amt-lbl">submitted</div></div>
               <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '1rem', marginBottom: '1.25rem', display: 'grid', gap: 8 }}>
                 {[
-                  ['Payment Method', selected.payment_method === 'gpay' ? 'Google Pay (GPay)' : selected.payment_method === 'neft' ? 'NEFT / Bank Transfer' : selected.payment_method || '—'],
-                  ['UTR / Reference No.', selected.utr_number || '—'],
+                  ['Payment Method', selected.payment_method === 'gpay' ? 'Google Pay (GPay)' : selected.payment_method === 'neft' ? 'NEFT / Bank Transfer' : selected.payment_method || '-'],
+                  ['UTR / Reference No.', selected.utr_number || '-'],
                   ['Submitted At', fmtDateTime(selected.payment_submitted_at)],
                 ].map(([k, v]) => (
                   <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
@@ -219,7 +219,7 @@ export default function PaymentVerifications() {
               </p>
               <div style={{ background: 'var(--green-light)', border: '1px solid rgba(22,101,52,.2)', borderRadius: 'var(--radius)', padding: '.75rem 1rem', fontSize: 13, color: '#166534', marginBottom: '1.25rem', display: 'flex', gap: 8, alignItems: 'center' }}>
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="#166534" fill="none" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                Amount: <strong>{formatCurrency(verifyConfirm.grand_total)}</strong> · UTR: <span style={{ fontFamily: 'var(--mono)' }}>{verifyConfirm.utr_number || '—'}</span>
+                Amount: <strong>{formatCurrency(verifyConfirm.grand_total)}</strong> · UTR: <span style={{ fontFamily: 'var(--mono)' }}>{verifyConfirm.utr_number || '-'}</span>
               </div>
               <div className="popup-foot">
                 <button className="btn-ghost" onClick={() => setVerifyConfirm(null)}>Cancel</button>

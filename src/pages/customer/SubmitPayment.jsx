@@ -58,7 +58,7 @@ export default function SubmitPayment() {
 
   const invoiceLabel = bill ? `#${bill.invoice_no}` : `#${id}`;
   const amtLabel     = bill ? fmtAmt(bill.grand_total) : '…';
-  const dueLabel     = bill?.due_date ?? '—';
+  const dueLabel     = bill?.due_date ?? '-';
 
   if (submitted) {
     return (

@@ -48,7 +48,7 @@ export default function Customers() {
       const res = await customersApi.syncFromBilling();
       const d = res.data;
       if (!silent) {
-        setSyncMsg(`✓ Sync done — ${d.created} new, ${d.updated} updated`);
+        setSyncMsg(`✓ Sync done - ${d.created} new, ${d.updated} updated`);
         setTimeout(() => setSyncMsg(''), 4000);
       }
       await fetchCustomers();
@@ -66,7 +66,7 @@ export default function Customers() {
   };
 
   useEffect(() => {
-    // Load customers directly from DB — no ERP call on page load.
+    // Load customers directly from DB - no ERP call on page load.
     // Use the Sync button to pull fresh data from the billing system.
     fetchCustomers();
   }, []);

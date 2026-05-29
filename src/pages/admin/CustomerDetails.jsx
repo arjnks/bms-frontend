@@ -90,15 +90,15 @@ export default function CustomerDetails() {
           <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--text-secondary)' }}>Email</span>
-              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{user.email || '—'}</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{user.email || '-'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--text-secondary)' }}>Phone (WhatsApp)</span>
-              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{user.phone || '—'}</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{user.phone || '-'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--text-secondary)' }}>ERP Code</span>
-              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{customer.external_cucode || '—'}</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{customer.external_cucode || '-'}</span>
             </div>
           </div>
         </Card>
@@ -153,8 +153,8 @@ export default function CustomerDetails() {
                   bills.map(b => (
                     <tr key={b.id}>
                       <td style={{ fontWeight: 500 }}>{b.invoice_no}</td>
-                      <td>{b.bill_date ? fmtDate(b.bill_date) : '—'}</td>
-                      <td>{b.due_date ? fmtDate(b.due_date) : '—'}</td>
+                      <td>{b.bill_date ? fmtDate(b.bill_date) : '-'}</td>
+                      <td>{b.due_date ? fmtDate(b.due_date) : '-'}</td>
                       <td style={{ fontWeight: 600 }}>{fmtAmt(b.grand_total)}</td>
                       <td>
                         <StatusBadge 

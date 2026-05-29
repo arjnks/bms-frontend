@@ -134,7 +134,7 @@ export default function AdminBills() {
                           {b.customer_name?.split(' ').map(n => n[0]).join('').slice(0,2) ?? '??'}
                         </div>
                         <div>
-                          <div className="cust-name">{b.customer_name ?? '—'}</div>
+                          <div className="cust-name">{b.customer_name ?? '-'}</div>
                         </div>
                       </div>
                     </td>
@@ -146,7 +146,7 @@ export default function AdminBills() {
                     <td>
                       <span className={`badge ${b.bill_file_type === 'csv' ? 'b-blue' : 'b-green'}`}
                         style={{ fontFamily: 'var(--mono)', fontSize: 11 }}>
-                        {b.bill_file_type?.toUpperCase() ?? '—'}
+                        {b.bill_file_type?.toUpperCase() ?? '-'}
                       </span>
                     </td>
                     <td><StatusBadge status={b.payment_status} /></td>

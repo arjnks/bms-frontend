@@ -105,7 +105,7 @@ export default function Reports() {
       <div className="reports-charts">
         <div className="chart-card">
           <div className="chart-hdr">
-            <div><div className="chart-title">Monthly Collections</div><div className="chart-sub">Rs.  Collected — last 12 months</div></div>
+            <div><div className="chart-title">Monthly Collections</div><div className="chart-sub">Rs.  Collected - last 12 months</div></div>
           </div>
           <div className="chart-wrap">
             <ResponsiveContainer width="100%" height="100%">
