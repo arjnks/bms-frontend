@@ -51,6 +51,18 @@ export default function MyBills() {
   };
   useEffect(() => { load(); }, []);
 
+  // Auto-fetch ERP bills for the last 12 months on mount (for customers with a cucode)
+  useEffect(() => {
+    if (!hasCucode) return;
+    const oneYearAgo = () => { const d = new Date(); d.setFullYear(d.getFullYear() - 1); return d.toISOString().slice(0, 10); };
+    setExtLoading(true);
+    setExtFetched(true);
+    billsApi.externalList({ from_date: oneYearAgo(), to_date: today() })
+      .then(res => setExtBills(res.data ?? []))
+      .catch(() => {})
+      .finally(() => setExtLoading(false));
+  }, [hasCucode]);
+
   // Decide popup on mount
   useEffect(() => {
     if (loading || bills.length === 0) return;
@@ -68,7 +80,7 @@ export default function MyBills() {
     }
   }, [loading, bills]);
 
-  // Fetch external bills - called automatically on tab switch
+  // Fetch external bills - called manually when user changes date range
   const fetchExternal = async (from, to) => {
     if (!hasCucode) return;
     setExtLoading(true);
@@ -82,18 +94,21 @@ export default function MyBills() {
     } finally { setExtLoading(false); }
   };
 
-  // Auto-fetch when switching to bills-by-date tab
-  useEffect(() => {
-    if (tab === 'external' && hasCucode && !extFetched) {
-      fetchExternal();
-    }
-  }, [tab, hasCucode]);
+  // Combine local bills + ERP bills for metrics
+  const allBillsForMetrics = [
+    ...bills,
+    ...extBills.map(b => ({
+      bill_date: b.DATE,
+      grand_total: b.NETAMOUNT || 0,
+      payment_status: 'paid', // ERP bills are treated as delivered/paid for metric purposes
+    }))
+  ];
 
   const outstanding = bills
     .filter(b => b.payment_status === 'unpaid' || b.payment_status === 'proof_rejected')
     .reduce((s, b) => s + Number(b.grand_total), 0);
 
-  const thisMonth = bills.filter(b => {
+  const thisMonth = allBillsForMetrics.filter(b => {
     const d = new Date(b.bill_date); const now = new Date();
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).length;
@@ -101,6 +116,10 @@ export default function MyBills() {
   const lastPaid = bills
     .filter(b => b.payment_status === 'paid')
     .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))[0];
+
+  // Last ERP bill date as fallback for "Last paid"
+  const lastErpBillDate = extBills.length > 0 ? extBills[0]?.DATE : null;
+
 
   const handleDownloadPdf = async (bill) => {
     try {
@@ -135,16 +154,21 @@ export default function MyBills() {
 
         {/* Metrics */}
         <div className="metrics">
-          <div className="metric"><div className="metric-label">Total bills</div><div className="metric-val">{bills.length}</div></div>
+          <div className="metric"><div className="metric-label">Total bills</div><div className="metric-val">{allBillsForMetrics.length}</div></div>
           <div className="metric"><div className="metric-label">This month</div><div className="metric-val">{thisMonth}</div></div>
           <div className="metric"><div className="metric-label">Outstanding</div><div className="metric-val red">{fmtAmt(outstanding)}</div></div>
           <div className="metric">
-            <div className="metric-label">Last paid</div>
+            <div className="metric-label">Last bill</div>
             <div className="metric-val" style={{ fontSize: 20 }}>
-              {lastPaid ? new Date(lastPaid.updated_at).toLocaleDateString('en-IN') : '-'}
+              {lastPaid
+                ? new Date(lastPaid.updated_at).toLocaleDateString('en-IN')
+                : lastErpBillDate
+                  ? new Date(lastErpBillDate).toLocaleDateString('en-IN')
+                  : '-'}
             </div>
           </div>
         </div>
+
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 4, marginBottom: '1.25rem', borderBottom: '2px solid var(--border)', paddingBottom: 0 }}>
