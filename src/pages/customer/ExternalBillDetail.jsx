@@ -32,7 +32,7 @@ export default function ExternalBillDetail() {
 
   const handleDownload = useCallback(() => {
     setDownloading(true);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('leo-token');
     const url = billsApi.externalDownloadUrl(billno);
     // Open with auth header - create a temporary anchor with token-authenticated fetch
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
