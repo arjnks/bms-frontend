@@ -25,7 +25,7 @@ export default function Login() {
     if (!loginForm.email || !loginForm.password) { setLoginErr('Please enter email and password.'); return; }
     setLoginErr(''); setLoginLoading(true);
     try {
-      const user = await login(loginForm);
+      const user = await login({ login: loginForm.email, password: loginForm.password });
       navigate(user.role === 'admin' ? '/dashboard' : '/portal', { replace: true });
     } catch (err) {
       if (err?.status === 403) {
@@ -78,8 +78,8 @@ export default function Login() {
           {tab === 'login' && (
             <form onSubmit={handleLogin} noValidate>
               <div className="mf-group">
-                <label className="mf-label">Email</label>
-                <input className="mf-input" type="email" placeholder="you@example.com" autoComplete="email"
+                <label className="mf-label">Email / Customer Code</label>
+                <input className="mf-input" type="text" placeholder="you@example.com or ERP-XXXX" autoComplete="username"
                   value={loginForm.email}
                   onChange={e => setLoginForm(f => ({ ...f, email: e.target.value }))} />
               </div>
