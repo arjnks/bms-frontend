@@ -48,22 +48,36 @@ export default function CustomerDetails() {
   const handleExtDownload = async (billno) => {
     try {
       showToast('Preparing download...', 'info');
-      const safeBillno = billno.replace(/[\/\\]/g, '-');
-      const response = await api.get(`/admin/customers/${id}/external-bills/${encodeURIComponent(safeBillno)}/download`, {
-        responseType: 'blob'
-      });
-      const url = window.URL.createObjectURL(new Blob([response], { type: 'application/pdf' }));
+      const safeBillno = billno.replace(/[/\\]/g, '-');
+      const token = localStorage.getItem('leo-token');
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+
+      const res = await fetch(
+        `${baseUrl}/admin/customers/${id}/external-bills/${encodeURIComponent(safeBillno)}/download`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/pdf',
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error('Download failed:', res.status, errText);
+        showToast(`Download failed (${res.status})`, 'error');
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `bill_${safeBillno}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
-      
-      setTimeout(() => {
-        window.URL.revokeObjectURL(url);
-      }, 1000);
-      
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
       showToast('Download complete!', 'success');
     } catch (err) {
       console.error(err);
