@@ -48,7 +48,7 @@ export default function CustomerDetails() {
   const handleExtDownload = async (billno) => {
     try {
       showToast('Preparing download...', 'info');
-      const safeBillno = billno.replace(/[/\\]/g, '-');
+      const safeBillno = String(billno).replace(/[/\\]/g, '-');
 
       const res = await api.get(`/admin/customers/${id}/external-bills/${encodeURIComponent(safeBillno)}/download`);
       if (res.data && res.data.download_url) {
