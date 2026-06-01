@@ -51,8 +51,8 @@ export default function CustomerDetails() {
       const safeBillno = String(billno).replace(/[/\\]/g, '-');
 
       const res = await api.get(`/admin/customers/${id}/external-bills/${encodeURIComponent(safeBillno)}/download`);
-      if (res.data && res.data.download_url) {
-        window.open(res.data.download_url, '_blank');
+      if (res && res.download_url) {
+        window.open(res.download_url, '_blank');
         showToast('Download complete!', 'success');
       } else {
         throw new Error('No download URL returned');
