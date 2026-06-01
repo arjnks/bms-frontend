@@ -46,6 +46,9 @@ export function AuthProvider({ children }) {
     try { await authApi.logout(); } catch (_) {}
     localStorage.removeItem('leo-token');
     localStorage.removeItem('leo-user');
+    Object.keys(sessionStorage).forEach(k => {
+      if (k.startsWith('leo-')) sessionStorage.removeItem(k);
+    });
     setUser(null);
     window.location.href = '/login';
   };

@@ -23,6 +23,9 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       localStorage.removeItem('leo-token');
       localStorage.removeItem('leo-user');
+      Object.keys(sessionStorage).forEach(k => {
+        if (k.startsWith('leo-')) sessionStorage.removeItem(k);
+      });
       window.location.href = '/login';
     }
     return Promise.reject(err.response?.data || err);
