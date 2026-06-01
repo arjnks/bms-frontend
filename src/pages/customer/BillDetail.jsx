@@ -116,45 +116,46 @@ export default function BillDetail() {
 
         <div className="form-layout">
           <div>
-            <Card style={{ marginBottom: '1.25rem' }}>
-              <CardHeader title="Line items" />
-              <table>
-                <thead>
-                  <tr><th>#</th><th>Product</th><th>HSN</th><th>Qty</th><th>Rate</th><th>GST</th><th>Amount</th></tr>
-                </thead>
-                <tbody>
-                  {lineItems.map((l, i) => {
-                    const t = lineTotal(l);
-                    return (
-                      <tr key={i}>
-                        <td style={{ color: 'var(--text-3)', fontSize: 12 }}>{i + 1}</td>
-                        <td style={{ fontWeight: 500 }}>{getItemName(l)}</td>
-                        <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{getHsn(l)}</td>
-                        <td>{getQty(l)} {getUnit(l)}</td>
-                        <td>Rs. {Number(getRate(l)).toLocaleString('en-IN')}</td>
-                        <td><span className="badge b-blue">{getGst(l)}%</span></td>
-                        <td style={{ fontWeight: 600 }}>Rs. {t.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              {/* Totals */}
-              <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
-                <div style={{ display: 'flex', gap: 48, fontSize: 13 }}>
-                  <span style={{ color: 'var(--text-2)' }}>Subtotal</span>
-                  <span style={{ fontWeight: 600 }}>Rs. {subtotal.toLocaleString('en-IN')}</span>
-                </div>
-                <div style={{ display: 'flex', gap: 48, fontSize: 13 }}>
-                  <span style={{ color: 'var(--text-2)' }}>GST total</span>
-                  <span style={{ fontWeight: 600 }}>Rs. {gstTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
-                </div>
-                <div style={{ display: 'flex', gap: 48, fontSize: 16, fontWeight: 700, color: 'var(--text)', borderTop: '1px solid var(--border)', paddingTop: 8, marginTop: 4 }}>
-                  <span>Grand Total</span>
-                  <span>Rs. {grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
-                </div>
-              </div>
-            </Card>
+            {lineItems.length > 0 && (
+              <Card style={{ marginBottom: '1.25rem' }}>
+                <CardHeader title="Line items" />
+                <table>
+                  <thead>
+                    <tr><th>#</th><th>Product</th><th>HSN</th><th>Qty</th><th>Rate</th><th>GST</th><th>Amount</th></tr>
+                  </thead>
+                  <tbody>
+                    {lineItems.map((l, i) => {
+                      const t = lineTotal(l);
+                      return (
+                        <tr key={i}>
+                          <td style={{ color: 'var(--text-3)', fontSize: 12 }}>{i + 1}</td>
+                          <td style={{ fontWeight: 500 }}>{getItemName(l)}</td>
+                          <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{getHsn(l)}</td>
+                          <td>{getQty(l)} {getUnit(l)}</td>
+                          <td>Rs. {Number(getRate(l)).toLocaleString('en-IN')}</td>
+                          <td><span className="badge b-blue">{getGst(l)}%</span></td>
+                          <td style={{ fontWeight: 600 }}>Rs. {t.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colSpan="6" style={{ textAlign: 'right', fontSize: 12, color: 'var(--text-2)' }}>Subtotal</td>
+                      <td style={{ fontWeight: 600 }}>Rs. {subtotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan="6" style={{ textAlign: 'right', fontSize: 12, color: 'var(--text-2)' }}>GST total</td>
+                      <td style={{ fontWeight: 600 }}>Rs. {gstTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan="6" style={{ textAlign: 'right', fontWeight: 600, fontSize: 13, color: 'var(--text)' }}>Grand Total</td>
+                      <td style={{ fontWeight: 700, fontSize: 14 }}>Rs. {grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </Card>
+            )}
           </div>
 
           <div>
