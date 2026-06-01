@@ -48,13 +48,13 @@ export default function CustomerDetails() {
   const handleExtDownload = async (billno) => {
     try {
       showToast('Preparing download...', 'info');
-      const response = await api.get(`/admin/customers/${id}/external-bills/${billno}/download`, {
+      const response = await api.get(`/admin/customers/${id}/external-bills/${encodeURIComponent(billno)}/download`, {
         responseType: 'blob'
       });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([response], { type: 'application/pdf' }));
       const a = document.createElement('a');
       a.href = url;
-      a.download = `bill_${billno}.pdf`;
+      a.download = `bill_${billno.replace(/[\/\\]/g, '_')}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
