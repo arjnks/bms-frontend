@@ -126,7 +126,11 @@ export default function AdminBills() {
               </thead>
               <tbody>
                 {filtered.map(b => (
-                  <tr key={b.id}>
+                  <tr
+                    key={b.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate(`/dashboard/bills/${b.id}`)}
+                  >
                     <td className="bill-no">#{b.invoice_no}</td>
                     <td>
                       <div className="cust-cell">
@@ -151,7 +155,7 @@ export default function AdminBills() {
                     </td>
                     <td><StatusBadge status={b.payment_status} /></td>
                     <td>
-                      <div className="act-btns">
+                      <div className="act-btns" onClick={e => e.stopPropagation()}>
                         {b.payment_status === 'payment_submitted' && (
                           <button className="btn-xs"
                             onClick={() => navigate('/dashboard/payments')}
@@ -159,6 +163,11 @@ export default function AdminBills() {
                             Review
                           </button>
                         )}
+                        <button className="btn-xs"
+                          onClick={() => navigate(`/dashboard/bills/${b.id}`)}
+                          style={{ background: 'var(--blue-light)', color: 'var(--blue)', borderColor: 'rgba(37,99,235,.2)' }}>
+                          View
+                        </button>
                       </div>
                     </td>
                   </tr>

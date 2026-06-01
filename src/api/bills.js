@@ -22,7 +22,12 @@ export const billsApi = {
   externalList:   (params) => api.get('/customer/external-bills', { params }),
   // Get line items for a bill (numeric BILLNO)
   externalDetail: (billno) => api.get(`/customer/external-bills/${billno}`),
-  // Stream download in preferred format - returns binary, use window.open
+  // Get a signed Railway-direct download URL (bypasses Vercel proxy for binary files)
+  externalGetDownloadUrl: (billno) => api.get(`/customer/external-bills/${billno}/download-url`),
+  // Legacy: raw URL string (kept for backward compat, prefer externalGetDownloadUrl)
   externalDownloadUrl: (billno) => `${api.defaults.baseURL}/customer/external-bills/${billno}/download`,
-};
 
+  // ── Admin bill detail ──────────────────────────────────────────────────────
+  adminGet:      (id) => api.get(`/admin/bills/${id}`),
+  adminDownload: (id) => api.get(`/admin/bills/${id}/download`),
+};

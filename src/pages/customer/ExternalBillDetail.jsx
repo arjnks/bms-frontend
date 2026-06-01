@@ -30,28 +30,24 @@ export default function ExternalBillDetail() {
       .finally(() => setLoading(false));
   }, [billno]);
 
-  const handleDownload = useCallback(() => {
+  const handleDownload = useCallback(async () => {
     setDownloading(true);
-    const token = localStorage.getItem('leo-token');
-    const url = billsApi.externalDownloadUrl(billno);
-    // Open with auth header - create a temporary anchor with token-authenticated fetch
-    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => {
-        if (!res.ok) throw new Error('Download failed');
-        return res.blob();
-      })
-      .then(blob => {
-        const ext = user?.customer?.preferred_bill_format === 'csv' ? 'csv'
-                  : user?.customer?.preferred_bill_format === 'pdf' ? 'pdf' : 'xlsx';
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `bill-${billno}.${ext}`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-      })
-      .catch(() => showToast('Download failed', 'error'))
-      .finally(() => setDownloading(false));
-  }, [billno, user]);
+    try {
+      // Get a signed Railway-direct URL (bypasses Vercel proxy — reliable for binary files)
+      const res = await billsApi.externalGetDownloadUrl(billno);
+      const url = res.download_url || res.url;
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        showToast('Could not get download link.', 'error');
+      }
+    } catch {
+      showToast('Download failed. Please try again.', 'error');
+    } finally {
+      setDownloading(false);
+    }
+  }, [billno]);
+
 
   if (loading) return (
     <>

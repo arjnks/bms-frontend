@@ -24,6 +24,7 @@ const Reminders           = lazy(() => import('./pages/admin/Reminders'));
 const AddRule             = lazy(() => import('./pages/admin/AddRule'));
 const Reports             = lazy(() => import('./pages/admin/Reports'));
 const AdminBills          = lazy(() => import('./pages/admin/AdminBills'));
+const AdminBillDetail     = lazy(() => import('./pages/admin/AdminBillDetail'));
 const CustomerLogins      = lazy(() => import('./pages/admin/CustomerLogins'));
 const SecurityLogs        = lazy(() => import('./pages/admin/SecurityLogs'));
 
@@ -54,6 +55,7 @@ export default function App() {
                   <Route path="/dashboard/customers"        element={<Customers />} />
                   <Route path="/dashboard/customers/:id"    element={<CustomerDetails />} />
                   <Route path="/dashboard/bills/upload"     element={<BillUpload />} />
+                  <Route path="/dashboard/bills/:id"       element={<AdminBillDetail />} />
                   <Route path="/dashboard/bills"            element={<AdminBills />} />
                   <Route path="/dashboard/logins"           element={<CustomerLogins />} />
                   <Route path="/dashboard/security-logs"    element={<SecurityLogs />} />
