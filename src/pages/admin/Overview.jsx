@@ -48,6 +48,8 @@ export default function Overview() {
   }
 
   const formatCurrency = (amt) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amt);
+  const duesThisMonth = data.dues_this_month ?? data.total_outstanding ?? 0;
+  const overdueAmount = data.overdue_amount ?? 0;
 
   return (
     <AppShell pendingPayments={0} pendingApprovals={0}>
@@ -70,11 +72,11 @@ export default function Overview() {
 
       {/* KPIs */}
       <div className="kpi-grid">
-        <KpiCard variant="red" value={formatCurrency(data.total_outstanding)} label="Dues This Month" change="Live Data" changeType="dn"
+        <KpiCard variant="red" value={formatCurrency(duesThisMonth)} label="Dues This Month" change={`${data.dues_this_month_count ?? data.total_unpaid ?? 0} bills due`} changeType="dn"
           icon={<svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>} />
         <KpiCard variant="blue" value={data.bills_today.toString()} label="Bills Sent Today" change="Live Data" changeType="up"
           icon={<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>} />
-        <KpiCard variant="amber" value={data.overdue_count.toString()} label="Overdue Bills" change="Live Data" changeType="dn"
+        <KpiCard variant="amber" value={data.overdue_count.toString()} label="Overdue Bills" change={formatCurrency(overdueAmount)} changeType="dn"
           icon={<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>} />
         <KpiCard variant="green" value={`${data.collection_rate}%`} label="Collection Rate" change="Live Data" changeType="up"
           icon={<svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>} />

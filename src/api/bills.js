@@ -22,9 +22,9 @@ export const billsApi = {
   // List bills by date range - from_date and to_date as 'YYYY-MM-DD'
   externalList:   (params) => api.get('/customer/external-bills', { params }),
   // Get line items for a bill (numeric BILLNO)
-  externalDetail: (billno) => api.get(`/customer/external-bills/${billno}`),
+  externalDetail: (billno) => api.get(`/customer/external-bills/${encodeURIComponent(String(billno).replace(/[\/\\]/g, '-'))}`),
   // Get a signed Railway-direct download URL (bypasses Vercel proxy for binary files)
-  externalGetDownloadUrl: (billno) => api.get(`/customer/external-bills/${billno}/download-url`),
+  externalGetDownloadUrl: (billno) => api.get(`/customer/external-bills/${encodeURIComponent(String(billno).replace(/[\/\\]/g, '-'))}/download-url`),
   // Legacy: raw URL string (kept for backward compat, prefer externalGetDownloadUrl)
   externalDownloadUrl: (billno) => `${api.defaults.baseURL}/customer/external-bills/${billno}/download`,
 
