@@ -9,9 +9,9 @@ import { billsApi } from '../../api/bills';
 import { useAuth } from '../../context/AuthContext';
 
 const lineTotal = (l) => {
-  const qty = Number(l.quantity ?? l.QUANTITY ?? 0);
-  const rate = Number(l.unit_price ?? l.SRATE ?? 0);
-  const gst = Number(l.gst_percentage ?? l.GSTRATE ?? 0);
+  const qty = parseFloat(l.quantity ?? l.QUANTITY ?? 0) || 0;
+  const rate = parseFloat(l.unit_price ?? l.SRATE ?? 0) || 0;
+  const gst = parseFloat(l.gst_percentage ?? l.GSTRATE ?? 0) || 0;
   const base = qty * rate;
   return { base, gstAmt: base * gst / 100, total: base + base * gst / 100 };
 };
@@ -19,10 +19,10 @@ const lineTotal = (l) => {
 const getFormat = () => localStorage.getItem('bill_format') || 'excel';
 const getItemName = (l) => l.product_name ?? l.ITEMNAME ?? l.item_name ?? '-';
 const getHsn = (l) => l.hsn_code ?? l.HSNCODE ?? '-';
-const getQty = (l) => l.qty ?? l.quantity ?? l.QUANTITY ?? 0;
+const getQty = (l) => parseFloat(l.qty ?? l.quantity ?? l.QUANTITY ?? 0) || 0;
 const getUnit = (l) => l.unit ?? '';
-const getRate = (l) => l.rate ?? l.unit_price ?? l.SRATE ?? 0;
-const getGst = (l) => l.gst_pct ?? l.gst_percentage ?? l.GSTRATE ?? 0;
+const getRate = (l) => parseFloat(l.rate ?? l.unit_price ?? l.SRATE ?? 0) || 0;
+const getGst = (l) => parseFloat(l.gst_pct ?? l.gst_percentage ?? l.GSTRATE ?? 0) || 0;
 
 export default function BillDetail() {
   const { id } = useParams();

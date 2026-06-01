@@ -22,9 +22,9 @@ const STATUS_COLORS = {
 
 const getItemName = (l) => l.product_name ?? l.ITEMNAME ?? l.item_name ?? '-';
 const getHsn = (l) => l.hsn_code ?? l.HSNCODE ?? '-';
-const getQty = (l) => l.qty ?? l.quantity ?? l.QUANTITY ?? 0;
-const getRate = (l) => l.rate ?? l.unit_price ?? l.SRATE ?? 0;
-const getGst = (l) => l.gst_pct ?? l.gst_percentage ?? l.GSTRATE ?? 0;
+const getQty = (l) => parseFloat(l.qty ?? l.quantity ?? l.QUANTITY ?? 0) || 0;
+const getRate = (l) => parseFloat(l.rate ?? l.unit_price ?? l.SRATE ?? 0) || 0;
+const getGst = (l) => parseFloat(l.gst_pct ?? l.gst_percentage ?? l.GSTRATE ?? 0) || 0;
 const getTotal = (l) => {
   if (l.line_total != null) return Number(l.line_total);
   if (l.total_amount != null) return Number(l.total_amount);
