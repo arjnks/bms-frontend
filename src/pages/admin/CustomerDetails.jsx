@@ -59,7 +59,12 @@ export default function CustomerDetails() {
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.URL.revokeObjectURL(url);
+      
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 1000);
+      
+      showToast('Download complete!', 'success');
     } catch (err) {
       console.error(err);
       showToast('Failed to download bill', 'error');
