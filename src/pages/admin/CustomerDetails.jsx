@@ -49,39 +49,17 @@ export default function CustomerDetails() {
     try {
       showToast('Preparing download...', 'info');
       const safeBillno = billno.replace(/[/\\]/g, '-');
-      const token = localStorage.getItem('leo-token');
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
-      const res = await fetch(
-        `${baseUrl}/admin/customers/${id}/external-bills/${encodeURIComponent(safeBillno)}/download`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/pdf',
-          },
-        }
-      );
-
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error('Download failed:', res.status, errText);
-        showToast(`Download failed (${res.status})`, 'error');
-        return;
+      const res = await api.get(`/admin/customers/${id}/external-bills/${encodeURIComponent(safeBillno)}/download`);
+      if (res.data && res.data.download_url) {
+        window.open(res.data.download_url, '_blank');
+        showToast('Download complete!', 'success');
+      } else {
+        throw new Error('No download URL returned');
       }
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `bill_${safeBillno}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-      showToast('Download complete!', 'success');
     } catch (err) {
-      console.error(err);
-      showToast('Failed to download bill', 'error');
+      console.error('Download error:', err);
+      showToast(`Download failed: ${err.message || 'Network error'}`, 'error');
     }
   };
 
