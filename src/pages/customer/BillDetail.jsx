@@ -9,14 +9,20 @@ import { billsApi } from '../../api/bills';
 import { useAuth } from '../../context/AuthContext';
 
 const lineTotal = (l) => {
-  const qty = Number(l.quantity);
-  const rate = Number(l.unit_price);
-  const gst = Number(l.gst_percentage);
+  const qty = Number(l.quantity ?? l.QUANTITY ?? 0);
+  const rate = Number(l.unit_price ?? l.SRATE ?? 0);
+  const gst = Number(l.gst_percentage ?? l.GSTRATE ?? 0);
   const base = qty * rate;
   return { base, gstAmt: base * gst / 100, total: base + base * gst / 100 };
 };
 
 const getFormat = () => localStorage.getItem('bill_format') || 'excel';
+const getItemName = (l) => l.product_name ?? l.ITEMNAME ?? l.item_name ?? '-';
+const getHsn = (l) => l.hsn_code ?? l.HSNCODE ?? '-';
+const getQty = (l) => l.qty ?? l.quantity ?? l.QUANTITY ?? 0;
+const getUnit = (l) => l.unit ?? '';
+const getRate = (l) => l.rate ?? l.unit_price ?? l.SRATE ?? 0;
+const getGst = (l) => l.gst_pct ?? l.gst_percentage ?? l.GSTRATE ?? 0;
 
 export default function BillDetail() {
   const { id } = useParams();
@@ -73,8 +79,9 @@ export default function BillDetail() {
     );
   }
 
-  const subtotal = bill.lineItems?.reduce((s, l) => s + Number(l.quantity) * Number(l.unit_price), 0) || 0;
-  const gstTotal = bill.lineItems?.reduce((s, l) => s + Number(l.quantity) * Number(l.unit_price) * Number(l.gst_percentage) / 100, 0) || 0;
+  const lineItems = bill.line_items ?? bill.lineItems ?? [];
+  const subtotal = Number(bill.subtotal) || lineItems.reduce((s, l) => s + Number(getQty(l)) * Number(getRate(l)), 0);
+  const gstTotal = Number(bill.gst_total) || lineItems.reduce((s, l) => s + Number(getQty(l)) * Number(getRate(l)) * Number(getGst(l)) / 100, 0);
   const grandTotal = Number(bill.grand_total);
 
   return (
@@ -116,16 +123,16 @@ export default function BillDetail() {
                   <tr><th>#</th><th>Product</th><th>HSN</th><th>Qty</th><th>Rate</th><th>GST</th><th>Amount</th></tr>
                 </thead>
                 <tbody>
-                  {bill.lineItems?.map((l, i) => {
+                  {lineItems.map((l, i) => {
                     const t = lineTotal(l);
                     return (
                       <tr key={i}>
                         <td style={{ color: 'var(--text-3)', fontSize: 12 }}>{i + 1}</td>
-                        <td style={{ fontWeight: 500 }}>{l.product_name}</td>
-                        <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{l.hsn_code}</td>
-                        <td>{l.quantity} {l.unit}</td>
-                        <td>Rs. {Number(l.unit_price).toLocaleString('en-IN')}</td>
-                        <td><span className="badge b-blue">{l.gst_percentage}%</span></td>
+                        <td style={{ fontWeight: 500 }}>{getItemName(l)}</td>
+                        <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{getHsn(l)}</td>
+                        <td>{getQty(l)} {getUnit(l)}</td>
+                        <td>Rs. {Number(getRate(l)).toLocaleString('en-IN')}</td>
+                        <td><span className="badge b-blue">{getGst(l)}%</span></td>
                         <td style={{ fontWeight: 600 }}>Rs. {t.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                       </tr>
                     );
@@ -160,7 +167,7 @@ export default function BillDetail() {
                   ['Customer code', user?.customer?.customer_code || 'N/A'],
                   ['Bill date', bill.bill_date],
                   ['Due date', bill.due_date],
-                  ['Total items', bill.lineItems?.length || 0],
+                  ['Total items', lineItems.length],
                   ['Grand total', `Rs. ${grandTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`],
                 ].map(([k, v]) => (
                   <div key={k} className="setting-row">
