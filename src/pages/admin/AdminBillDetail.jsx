@@ -20,6 +20,20 @@ const STATUS_COLORS = {
   proof_rejected:    { bg: '#fee2e2', color: '#991b1b' },
 };
 
+const getItemName = (l) => l.product_name ?? l.ITEMNAME ?? l.item_name ?? '-';
+const getHsn = (l) => l.hsn_code ?? l.HSNCODE ?? '-';
+const getQty = (l) => l.qty ?? l.quantity ?? l.QUANTITY ?? 0;
+const getRate = (l) => l.rate ?? l.unit_price ?? l.SRATE ?? 0;
+const getGst = (l) => l.gst_pct ?? l.gst_percentage ?? l.GSTRATE ?? 0;
+const getTotal = (l) => {
+  if (l.line_total != null) return Number(l.line_total);
+  if (l.total_amount != null) return Number(l.total_amount);
+  if (l.TOTALAMOUNT != null) return Number(l.TOTALAMOUNT);
+
+  const base = Number(getQty(l)) * Number(getRate(l));
+  return base + base * Number(getGst(l)) / 100;
+};
+
 export default function AdminBillDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -68,6 +82,7 @@ export default function AdminBillDetail() {
   };
 
   const handleMarkPaid = async () => {
+    if (!window.confirm('Are you sure you want to mark this bill as paid?')) return;
     setAction('mark');
     try {
       await billsApi.markPaid(id);
@@ -75,6 +90,18 @@ export default function AdminBillDetail() {
       load();
     } catch {
       showToast('Failed to mark as paid', 'error');
+    } finally { setAction(''); }
+  };
+
+  const handleRevert = async () => {
+    if (!window.confirm('Are you sure you want to revert this bill to unpaid?')) return;
+    setAction('revert');
+    try {
+      await billsApi.revert(id);
+      showToast('Bill reverted to unpaid', 'success');
+      load();
+    } catch {
+      showToast('Failed to revert bill', 'error');
     } finally { setAction(''); }
   };
 
@@ -106,7 +133,7 @@ export default function AdminBillDetail() {
 
   const statusStyle = STATUS_COLORS[bill.payment_status] ?? { bg: 'var(--surface-2)', color: 'var(--text-2)' };
   const hasProof = !!bill.proof_url;
-  const lineItems = bill.line_items ?? [];
+  const lineItems = bill.line_items ?? bill.lineItems ?? [];
 
   return (
     <AppShell>
@@ -172,44 +199,47 @@ export default function AdminBillDetail() {
             </div>
           </Card>
 
-          {/* Line items (if stored in DB) */}
-          {lineItems.length > 0 && (
-            <Card>
-              <CardHeader title={`Line Items (${lineItems.length})`} />
+          {/* Line items */}
+          <Card>
+            <CardHeader title={`Line Items (${lineItems.length})`} />
+            {lineItems.length === 0 ? (
+              <div style={{ padding: '1.5rem', color: 'var(--text-2)', fontSize: 13 }}>
+                No products were returned for this bill.
+              </div>
+            ) : (
               <div style={{ overflowX: 'auto' }}>
                 <table>
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Product</th>
-                      <th>HSN</th>
-                      <th style={{ textAlign: 'right' }}>Qty</th>
-                      <th style={{ textAlign: 'right' }}>Rate</th>
-                      <th style={{ textAlign: 'right' }}>GST%</th>
-                      <th style={{ textAlign: 'right' }}>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {lineItems.map((l, i) => {
-                      const base   = Number(l.quantity) * Number(l.unit_price);
-                      const total  = base + base * Number(l.gst_percentage) / 100;
-                      return (
-                        <tr key={i}>
-                          <td style={{ color: 'var(--text-3)', fontSize: 12 }}>{i + 1}</td>
-                          <td style={{ fontWeight: 500 }}>{l.product_name}</td>
-                          <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{l.hsn_code}</td>
-                          <td style={{ textAlign: 'right' }}>{l.quantity}</td>
-                          <td style={{ textAlign: 'right' }}>Rs. {Number(l.unit_price).toLocaleString('en-IN')}</td>
-                          <td style={{ textAlign: 'right' }}><span className="badge b-blue">{l.gst_percentage}%</span></td>
-                          <td style={{ textAlign: 'right', fontWeight: 600 }}>Rs. {total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>HSN</th>
+                    <th style={{ textAlign: 'right' }}>Qty</th>
+                    <th style={{ textAlign: 'right' }}>Rate</th>
+                    <th style={{ textAlign: 'right' }}>GST%</th>
+                    <th style={{ textAlign: 'right' }}>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lineItems.map((l, i) => {
+                    const total = getTotal(l);
+                    return (
+                      <tr key={i}>
+                        <td style={{ color: 'var(--text-3)', fontSize: 12 }}>{i + 1}</td>
+                        <td style={{ fontWeight: 500 }}>{getItemName(l)}</td>
+                        <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{getHsn(l)}</td>
+                        <td style={{ textAlign: 'right' }}>{getQty(l)}</td>
+                        <td style={{ textAlign: 'right' }}>Rs. {Number(getRate(l)).toLocaleString('en-IN')}</td>
+                        <td style={{ textAlign: 'right' }}><span className="badge b-blue">{getGst(l)}%</span></td>
+                        <td style={{ textAlign: 'right', fontWeight: 600 }}>Rs. {total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
               </div>
-            </Card>
-          )}
+            )}
+          </Card>
         </div>
 
         {/* RIGHT column */}
@@ -337,6 +367,17 @@ export default function AdminBillDetail() {
                   {actionLoading === 'mark'
                     ? <span style={{ width: 14, height: 14, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
                     : '✓'} Mark as Paid
+                </button>
+              )}
+
+              {bill.payment_status === 'paid' && (
+                <button
+                  className="btn"
+                  style={{ width: '100%', justifyContent: 'center', background: '#f3f4f6', color: '#374151', border: '1.5px solid #d1d5db', fontWeight: 600, borderRadius: 8, padding: '10px 0', cursor: 'pointer', fontSize: 13 }}
+                  onClick={handleRevert}
+                  disabled={!!actionLoading}
+                >
+                  {actionLoading === 'revert' ? '…' : '↺ Revert to Unpaid'}
                 </button>
               )}
 

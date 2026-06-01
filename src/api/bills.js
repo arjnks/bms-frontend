@@ -5,6 +5,7 @@ export const billsApi = {
   adminList: (params) => api.get('/admin/bills', { params }),
   upload:    (formData) => api.post('/admin/bills', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   markPaid:  (id) => api.post(`/admin/bills/${id}/mark-paid`),
+  revert:    (id) => api.post(`/admin/bills/${id}/revert`),
   verifyPayment: (id) => api.post(`/admin/bills/${id}/verify-payment`),
   rejectPayment: (id, reason) => api.post(`/admin/bills/${id}/reject-payment`, { rejection_reason: reason }),
 
