@@ -10,6 +10,36 @@ import api from '../../api/axios';
 const fmtAmt = (n) => `Rs. ${Number(n).toLocaleString('en-IN')}`;
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
+const getExtStatus = (b) => {
+  const settled = b.settled || b.SETTLED;
+  if (settled === 'Y') return 'paid';
+  const dateStr = b.date || b.DATE;
+  const lockdays = b.lockdays || b.LOCKDAYS || 0;
+  if (dateStr && lockdays) {
+    const d = new Date(dateStr);
+    d.setDate(d.getDate() + parseInt(lockdays, 10));
+    if (d < new Date()) return 'overdue';
+  }
+  return 'unpaid';
+};
+
+const getExtDueDate = (b) => {
+  const dateStr = b.date || b.DATE;
+  const lockdays = b.lockdays || b.LOCKDAYS || 0;
+  if (dateStr && lockdays) {
+    const d = new Date(dateStr);
+    d.setDate(d.getDate() + parseInt(lockdays, 10));
+    return d.toISOString().split('T')[0];
+  }
+  return null;
+};
+
+const getExtDueAmt = (b) => {
+  const net = parseFloat(b.netamount || b.NETAMOUNT || 0);
+  const rec = parseFloat(b.amtreceived || b.AMTRECEIVED || 0);
+  return net - rec;
+};
+
 export default function CustomerDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -257,7 +287,7 @@ export default function CustomerDetails() {
               <div className="table-responsive">
                 <table className="table">
                   <thead>
-                    <tr><th>Bill No.</th><th>Date</th><th>Net Amount</th><th>Actions</th></tr>
+                    <tr><th>Bill No.</th><th>Date</th><th>Due Date</th><th>Due Amount</th><th>Status</th><th>Actions</th></tr>
                   </thead>
                   <tbody>
                     {extLoading ? (
@@ -265,16 +295,33 @@ export default function CustomerDetails() {
                     ) : extBills.length === 0 ? (
                       <tr><td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>No bills found in this date range.</td></tr>
                     ) : (
-                      extBills.map((b, i) => (
-                        <tr key={i}>
-                          <td style={{ fontWeight: 500 }}>{b.BN}</td>
-                          <td>{b.DATE}</td>
-                          <td style={{ fontWeight: 600 }}>{fmtAmt(b.NETAMOUNT)}</td>
-                          <td>
-                            <button className="btn btn-secondary btn-sm" onClick={() => handleExtDownload(b.BILLNO)}>Download PDF</button>
-                          </td>
-                        </tr>
-                      ))
+                      extBills.map((b, i) => {
+                        const status = getExtStatus(b);
+                        const dueDate = getExtDueDate(b);
+                        const dueAmt = getExtDueAmt(b);
+                        const dateStr = b.date || b.DATE;
+                        const billNo = b.billno || b.BILLNO || b.BN;
+                        return (
+                          <tr key={i}>
+                            <td style={{ fontWeight: 500 }}>{billNo}</td>
+                            <td>{dateStr ? fmtDate(dateStr) : '-'}</td>
+                            <td>{dueDate ? fmtDate(dueDate) : '-'}</td>
+                            <td style={{ fontWeight: 600 }}>{fmtAmt(dueAmt)}</td>
+                            <td>
+                              <StatusBadge 
+                                status={status} 
+                                type={
+                                  status === 'paid' ? 'success' :
+                                  status === 'overdue' ? 'danger' : 'warning'
+                                } 
+                              />
+                            </td>
+                            <td>
+                              <button className="btn btn-secondary btn-sm" onClick={() => handleExtDownload(billNo)}>Download PDF</button>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>

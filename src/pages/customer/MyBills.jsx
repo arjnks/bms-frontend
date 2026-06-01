@@ -17,6 +17,36 @@ const POPUP_NONE        = null;
 const POPUP_OUTSTANDING = 'outstanding';
 const POPUP_REJECTED    = 'rejected';
 
+const getExtStatus = (b) => {
+  const settled = b.settled || b.SETTLED;
+  if (settled === 'Y') return 'paid';
+  const dateStr = b.date || b.DATE;
+  const lockdays = b.lockdays || b.LOCKDAYS || 0;
+  if (dateStr && lockdays) {
+    const d = new Date(dateStr);
+    d.setDate(d.getDate() + parseInt(lockdays, 10));
+    if (d < new Date()) return 'overdue';
+  }
+  return 'unpaid';
+};
+
+const getExtDueDate = (b) => {
+  const dateStr = b.date || b.DATE;
+  const lockdays = b.lockdays || b.LOCKDAYS || 0;
+  if (dateStr && lockdays) {
+    const d = new Date(dateStr);
+    d.setDate(d.getDate() + parseInt(lockdays, 10));
+    return d.toISOString().split('T')[0];
+  }
+  return null;
+};
+
+const getExtDueAmt = (b) => {
+  const net = parseFloat(b.netamount || b.NETAMOUNT || 0);
+  const rec = parseFloat(b.amtreceived || b.AMTRECEIVED || 0);
+  return net - rec;
+};
+
 export default function MyBills() {
   const { user }   = useAuth();
   const navigate   = useNavigate();
@@ -298,23 +328,40 @@ export default function MyBills() {
                     ) : (
                       <table>
                         <thead>
-                          <tr><th>Bill No.</th><th>Date</th><th>Net Amount</th><th>Actions</th></tr>
+                          <tr><th>Bill No.</th><th>Date</th><th>Due Date</th><th>Due Amount</th><th>Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
-                          {extBills.map((b, i) => (
-                            <tr key={i}>
-                              <td className="bill-no" style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{b.BN}</td>
-                              <td style={{ fontSize: 13 }}>{b.DATE}</td>
-                              <td style={{ fontWeight: 600 }}>{fmtAmt2(b.NETAMOUNT)}</td>
-                              <td>
-                                <div className="act-btns">
-                                  <button className="btn-dl" onClick={() => navigate(`/portal/external-bills/${b.BILLNO}`)}>
-                                    <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View & Download
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
+                          {extBills.map((b, i) => {
+                            const status = getExtStatus(b);
+                            const dueDate = getExtDueDate(b);
+                            const dueAmt = getExtDueAmt(b);
+                            const dateStr = b.date || b.DATE;
+                            const billNo = b.billno || b.BILLNO || b.BN;
+                            return (
+                              <tr key={i}>
+                                <td className="bill-no" style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{billNo}</td>
+                                <td style={{ fontSize: 13 }}>{dateStr ? dateStr.split(' ')[0] : '-'}</td>
+                                <td style={{ fontSize: 13 }}>{dueDate || '-'}</td>
+                                <td style={{ fontWeight: 600 }}>{fmtAmt2(dueAmt)}</td>
+                                <td>
+                                  <StatusBadge 
+                                    status={status} 
+                                    type={
+                                      status === 'paid' ? 'success' :
+                                      status === 'overdue' ? 'danger' : 'warning'
+                                    } 
+                                  />
+                                </td>
+                                <td>
+                                  <div className="act-btns">
+                                    <button className="btn-dl" onClick={() => navigate(`/portal/external-bills/${billNo}`)}>
+                                      <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View & Download
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     )}
