@@ -5,6 +5,7 @@ import { Sidebar } from '../../components/layout/Sidebar';
 import { Card, CardHeader } from '../../components/ui/Card';
 import { StatusBadge } from '../../components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
+import { DownloadFormatModal } from '../../components/ui/DownloadFormatModal';
 import { billsApi } from '../../api/bills';
 import { useAuth } from '../../context/AuthContext';
 
@@ -30,6 +31,8 @@ export default function BillDetail() {
   const { user } = useAuth();
   const [bill, setBill] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [downloadingFormat, setDownloadingFormat] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     billsApi.get(id)
@@ -40,10 +43,10 @@ export default function BillDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleDownload = async () => {
+  const handleDownload = async (selectedFormat) => {
+    setDownloadingFormat(selectedFormat);
     try {
-      const res = await billsApi.downloadUrl(id);
-      // Axios interceptor unwraps response.data, so res IS the body
+      const res = await billsApi.downloadUrl(id, selectedFormat);
       const url = res.download_url || res.url;
       if (url) {
         window.open(url, '_blank');
@@ -52,6 +55,9 @@ export default function BillDetail() {
       }
     } catch (err) {
       showToast('Failed to get download link', 'error');
+    } finally {
+      setDownloadingFormat(null);
+      setModalOpen(false);
     }
   };
 
@@ -107,9 +113,9 @@ export default function BillDetail() {
                 💳 Submit Payment
               </button>
             )}
-            <button className="btn btn-outline btn-sm" onClick={handleDownload}>
+            <button className="btn btn-outline btn-sm" onClick={() => setModalOpen(true)}>
               <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download {getFormat() === 'csv' ? 'CSV' : 'Excel'}
+              Download Bill
             </button>
           </div>
         </div>
@@ -187,6 +193,13 @@ export default function BillDetail() {
             )}
           </div>
         </div>
+
+        <DownloadFormatModal 
+          open={modalOpen} 
+          onClose={() => setModalOpen(false)} 
+          onDownload={handleDownload}
+          downloadingFormat={downloadingFormat}
+        />
       </main>
     </>
   );

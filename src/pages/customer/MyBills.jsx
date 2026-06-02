@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { Modal } from '../../components/ui/Modal';
+import { DownloadFormatModal } from '../../components/ui/DownloadFormatModal';
 import { StatusBadge } from '../../components/ui/Badge';
 import { useAuth } from '../../context/AuthContext';
 import { showToast } from '../../components/ui/Toast';
@@ -62,6 +63,8 @@ export default function MyBills() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [popupType, setPopupType] = useState(POPUP_NONE);
   const [rejectedBill, setRejectedBill] = useState(null);
+  const [downloadingFormat, setDownloadingFormat] = useState(null);
+  const [modalBillId, setModalBillId] = useState(null);
 
   // â”€â”€ External bills state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [fromDate, setFromDate]       = useState(firstOfMonth());
@@ -151,13 +154,19 @@ export default function MyBills() {
   const lastErpBillDate = extBills.length > 0 ? extBills[0]?.DATE : null;
 
 
-  const handleDownloadPdf = async (bill) => {
+  const handleDownload = async (selectedFormat) => {
+    if (!modalBillId) return;
     try {
-      const res = await billsApi.downloadUrl(bill.id);
+      setDownloadingFormat(selectedFormat);
+      const res = await billsApi.downloadUrl(modalBillId, selectedFormat);
       const url = res.download_url || res.url;
       if (url) window.open(url, '_blank');
       else showToast('File not yet available.', 'error');
     } catch { showToast('Failed to get download link', 'error'); }
+    finally {
+      setDownloadingFormat(null);
+      setModalBillId(null);
+    }
   };
 
   const filtered = bills.filter(b => {
@@ -252,7 +261,7 @@ export default function MyBills() {
                           <button className="btn-dl" onClick={() => navigate(`/portal/bills/${b.id}`)}>
                             <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View
                           </button>
-                          <button className="btn-dl" onClick={() => handleDownloadPdf(b)}>
+                          <button className="btn-dl" onClick={() => setModalBillId(b.id)}>
                             <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download
                           </button>
                           {b.payment_status === 'unpaid' && (
@@ -442,6 +451,13 @@ export default function MyBills() {
           </div>
         )}
       </Modal>
+
+      <DownloadFormatModal 
+        open={!!modalBillId} 
+        onClose={() => setModalBillId(null)} 
+        onDownload={handleDownload}
+        downloadingFormat={downloadingFormat}
+      />
     </>
   );
 }

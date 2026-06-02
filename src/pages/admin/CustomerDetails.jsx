@@ -4,6 +4,7 @@ import { AppShell } from '../../components/layout/AppShell';
 import { Card, CardHeader } from '../../components/ui/Card';
 import { StatusBadge } from '../../components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
+import { DownloadFormatModal } from '../../components/ui/DownloadFormatModal';
 import { customersApi } from '../../api/customers';
 import api from '../../api/axios';
 
@@ -47,6 +48,8 @@ export default function CustomerDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [acting, setActing] = useState(false);
+  const [downloadingFormat, setDownloadingFormat] = useState(null);
+  const [modalBillNo, setModalBillNo] = useState(null);
 
   const [tab, setTab] = useState('local');
   const [fromDate, setFromDate] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 10); });
@@ -75,12 +78,14 @@ export default function CustomerDetails() {
     }
   }, [tab, customer, extFetched]);
 
-  const handleExtDownload = async (billno) => {
+  const handleExtDownload = async (selectedFormat) => {
+    if (!modalBillNo) return;
     try {
+      setDownloadingFormat(selectedFormat);
       showToast('Preparing download...', 'info');
-      const safeBillno = String(billno).replace(/[/\\]/g, '-');
+      const safeBillno = String(modalBillNo).replace(/[/\\]/g, '-');
 
-      const res = await api.get(`/admin/customers/${id}/external-bills/${encodeURIComponent(safeBillno)}/download`);
+      const res = await api.get(`/admin/customers/${id}/external-bills/${encodeURIComponent(safeBillno)}/download${selectedFormat ? `?format=${selectedFormat}` : ''}`);
       if (res && res.download_url) {
         window.open(res.download_url, '_blank');
         showToast('Download complete!', 'success');
@@ -90,6 +95,9 @@ export default function CustomerDetails() {
     } catch (err) {
       console.error('Download error:', err);
       showToast(`Download failed: ${err.message || 'Network error'}`, 'error');
+    } finally {
+      setDownloadingFormat(null);
+      setModalBillNo(null);
     }
   };
 
@@ -317,7 +325,7 @@ export default function CustomerDetails() {
                               />
                             </td>
                             <td>
-                              <button className="btn btn-secondary btn-sm" onClick={() => handleExtDownload(billNo)}>Download PDF</button>
+                              <button className="btn btn-secondary btn-sm" onClick={() => setModalBillNo(billNo)}>Download Bill</button>
                             </td>
                           </tr>
                         );
@@ -333,6 +341,12 @@ export default function CustomerDetails() {
       </div>
       )}
 
+      <DownloadFormatModal 
+        open={!!modalBillNo} 
+        onClose={() => setModalBillNo(null)} 
+        onDownload={handleExtDownload}
+        downloadingFormat={downloadingFormat}
+      />
     </AppShell>
   );
 }

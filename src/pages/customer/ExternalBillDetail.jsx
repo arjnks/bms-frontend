@@ -4,6 +4,7 @@ import { Navbar } from '../../components/layout/Navbar';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { Card, CardHeader } from '../../components/ui/Card';
 import { showToast } from '../../components/ui/Toast';
+import { DownloadFormatModal } from '../../components/ui/DownloadFormatModal';
 import { billsApi } from '../../api/bills';
 import { useAuth } from '../../context/AuthContext';
 
@@ -18,7 +19,8 @@ export default function ExternalBillDetail() {
   const [items, setItems]       = useState([]);
   const [summary, setSummary]   = useState(null);
   const [loading, setLoading]   = useState(true);
-  const [downloading, setDownloading] = useState(false);
+  const [downloadingFormat, setDownloadingFormat] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     billsApi.externalDetail(billno)
@@ -30,11 +32,10 @@ export default function ExternalBillDetail() {
       .finally(() => setLoading(false));
   }, [billno]);
 
-  const handleDownload = useCallback(async () => {
-    setDownloading(true);
+  const handleDownload = useCallback(async (selectedFormat) => {
+    setDownloadingFormat(selectedFormat);
     try {
-      // Get a signed Railway-direct URL (bypasses Vercel proxy — reliable for binary files)
-      const res = await billsApi.externalGetDownloadUrl(billno);
+      const res = await billsApi.externalGetDownloadUrl(billno, selectedFormat);
       const url = res.download_url || res.url;
       if (url) {
         window.open(url, '_blank');
@@ -44,7 +45,8 @@ export default function ExternalBillDetail() {
     } catch {
       showToast('Download failed. Please try again.', 'error');
     } finally {
-      setDownloading(false);
+      setDownloadingFormat(null);
+      setModalOpen(false);
     }
   }, [billno]);
 
@@ -89,16 +91,11 @@ export default function ExternalBillDetail() {
             }}>Live from ERP</span>
             <button
               className="btn btn-primary btn-sm"
-              onClick={handleDownload}
-              disabled={downloading}
+              onClick={() => setModalOpen(true)}
               style={{ display: 'flex', alignItems: 'center', gap: 6 }}
             >
-              {downloading ? (
-                <span style={{ width: 14, height: 14, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
-              ) : (
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              )}
-              Download {format === 'csv' ? 'CSV' : format === 'pdf' ? 'PDF' : 'Excel'}
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Bill
             </button>
           </div>
         </div>
@@ -166,6 +163,13 @@ export default function ExternalBillDetail() {
             </Card>
           </div>
         </div>
+        
+        <DownloadFormatModal 
+          open={modalOpen} 
+          onClose={() => setModalOpen(false)} 
+          onDownload={handleDownload}
+          downloadingFormat={downloadingFormat}
+        />
       </main>
     </>
   );

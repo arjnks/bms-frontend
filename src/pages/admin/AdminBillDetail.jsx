@@ -4,6 +4,7 @@ import { AppShell } from '../../components/layout/AppShell';
 import { Card, CardHeader } from '../../components/ui/Card';
 import { StatusBadge } from '../../components/ui/Badge';
 import { showToast } from '../../components/ui/Toast';
+import { DownloadFormatModal } from '../../components/ui/DownloadFormatModal';
 import { billsApi } from '../../api/bills';
 
 const fmt = (n) => `Rs. ${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -40,7 +41,8 @@ export default function AdminBillDetail() {
 
   const [bill, setBill]               = useState(null);
   const [loading, setLoading]         = useState(true);
-  const [downloading, setDownloading] = useState(false);
+  const [downloadingFormat, setDownloadingFormat] = useState(null);
+  const [modalOpen, setModalOpen]     = useState(false);
   const [actionLoading, setAction]    = useState('');
   const [showRejectForm, setRejectForm] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
@@ -56,17 +58,18 @@ export default function AdminBillDetail() {
 
   useEffect(() => { load(); }, [id]);
 
-  const handleDownload = async () => {
-    setDownloading(true);
+  const handleDownload = async (selectedFormat) => {
+    setDownloadingFormat(selectedFormat);
     try {
-      const res = await billsApi.adminDownload(id);
+      const res = await billsApi.adminDownload(id, selectedFormat);
       const url = res.download_url || res.url;
       if (url) window.open(url, '_blank');
       else showToast('No file available for this bill.', 'error');
     } catch {
       showToast('Download failed. Please try again.', 'error');
     } finally {
-      setDownloading(false);
+      setDownloadingFormat(null);
+      setModalOpen(false);
     }
   };
 
@@ -157,15 +160,11 @@ export default function AdminBillDetail() {
           <StatusBadge status={bill.payment_status} />
           <button
             className="btn btn-outline btn-sm"
-            onClick={handleDownload}
-            disabled={downloading}
+            onClick={() => setModalOpen(true)}
             style={{ display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            {downloading
-              ? <span style={{ width: 13, height: 13, border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
-              : <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            }
-            {downloading ? 'Downloading…' : 'Download Bill'}
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Bill
           </button>
         </div>
       </div>
@@ -438,6 +437,13 @@ export default function AdminBillDetail() {
           />
         </div>
       )}
+
+      <DownloadFormatModal 
+        open={modalOpen} 
+        onClose={() => setModalOpen(false)} 
+        onDownload={handleDownload}
+        downloadingFormat={downloadingFormat}
+      />
     </AppShell>
   );
 }
