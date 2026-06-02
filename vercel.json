@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/v1/:match*",
-      "destination": "https://bms-backend-production-d0fe.up.railway.app/api/v1/:match*"
+      "destination": "https://api.leopharma.tech/api/v1/:match*"
     },
     {
       "source": "/(.*)",
