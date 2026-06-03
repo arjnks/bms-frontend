@@ -18,16 +18,28 @@ export default function Reminders() {
   const [sendTime, setSendTime] = useState('09:00');
   const navigate = useNavigate();
 
-  const fetchRules = () => {
+  const fetchRulesAndSettings = () => {
     setLoading(true);
-    remindersApi.list()
-      .then(res => setRules(res.data || res))
-      .catch(err => setError('Failed to load rules.'))
+    Promise.all([
+      remindersApi.list(),
+      remindersApi.getSettings()
+    ])
+      .then(([rulesRes, settingsRes]) => {
+        setRules(rulesRes.data || rulesRes);
+        const s = settingsRes.data || settingsRes;
+        if (s) {
+          setPopupOn(s.popup_on ?? true);
+          setThreshold(s.threshold ?? 1000);
+          setFreq(s.freq ?? 'every_login');
+          setSendTime(s.send_time ?? '09:00');
+        }
+      })
+      .catch(err => setError('Failed to load rules and settings.'))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    fetchRules();
+    fetchRulesAndSettings();
   }, []);
 
   const toggle = async (id, currentStatus) => {
@@ -41,7 +53,19 @@ export default function Reminders() {
     }
   };
 
-  const saveSettings = () => showToast('✓ Portal popup settings saved');
+  const saveSettings = async () => {
+    try {
+      await remindersApi.saveSettings({
+        popup_on: popupOn,
+        threshold: threshold,
+        freq: freq,
+        send_time: sendTime
+      });
+      showToast('✓ Portal popup settings saved');
+    } catch (err) {
+      showToast('Failed to save settings', 'error');
+    }
+  };
 
   const getIcon = (type) => {
     if (type === 'before_due') return { icon: '🔔', iconBg: '#fef9ec', iconColor: '#b45309' };
