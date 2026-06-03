@@ -52,7 +52,7 @@ export default function CustomerDetails() {
   const [modalBillNo, setModalBillNo] = useState(null);
 
   const [tab, setTab] = useState('local');
-  const [fromDate, setFromDate] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 10); });
+  const [fromDate, setFromDate] = useState(() => { const d = new Date(); d.setFullYear(d.getFullYear() - 2); return d.toISOString().slice(0, 10); });
   const [toDate, setToDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [extBills, setExtBills] = useState([]);
   const [extLoading, setExtLoading] = useState(false);
@@ -153,10 +153,10 @@ export default function CustomerDetails() {
   const user = customer.user || {};
   const bills = customer.bills || [];
   
-  // Outstanding is sum of unpaid bills
-  const outstandingAmount = bills
-    .filter(b => b.payment_status === 'unpaid' || b.payment_status === 'proof_rejected' || b.status === 'unpaid' || b.status === 'overdue')
-    .reduce((sum, b) => sum + Number(b.grand_total), 0);
+  // Use server-computed outstanding amount for accuracy (includes partial payments and historical dues)
+  const outstandingAmount = customer.outstanding_amount ?? bills
+    .filter(b => !b.is_settled)
+    .reduce((sum, b) => sum + Math.max(0, Number(b.grand_total) - Number(b.amount_received ?? 0)), 0);
 
   return (
     <AppShell title="Customer Details">
