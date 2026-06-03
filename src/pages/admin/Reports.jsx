@@ -17,21 +17,24 @@ export default function Reports() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    Promise.all([
-      reportsApi.aging(),
-      reportsApi.collections(),
-      reportsApi.overview(),
-      billsApi.adminList({ is_overdue: true })
-    ]).then(([agingRes, collRes, overRes, billsRes]) => {
-      setAging(agingRes.data || agingRes);
-      setCollections(collRes.data || collRes);
-      setOverview(overRes.data || overRes);
-      setOverdueBills((billsRes.data?.data || billsRes.data || billsRes).slice(0, 10)); // Top 10
-    }).catch(err => {
-      setError('Failed to load reports.');
-    }).finally(() => {
-      setLoading(false);
-    });
+    // Fetch each independently so one failure doesn't blank the whole page
+    reportsApi.aging()
+      .then(r => setAging(r.data || r))
+      .catch(() => setAging({ '0_30_days': { count: 0, total_amount: 0 }, '31_60_days': { count: 0, total_amount: 0 }, '60_plus_days': { count: 0, total_amount: 0 } }));
+
+    reportsApi.collections()
+      .then(r => setCollections(r.data || r))
+      .catch(() => setCollections([]));
+
+    reportsApi.overview()
+      .then(r => setOverview(r.data || r))
+      .catch(() => setOverview(null));
+
+    billsApi.adminList({ is_overdue: true })
+      .then(r => setOverdueBills((r.data?.data || r.data || r).slice(0, 10)))
+      .catch(() => setOverdueBills([]));
+
+    setLoading(false);
   }, []);
 
   if (loading) {
@@ -42,21 +45,20 @@ export default function Reports() {
     );
   }
 
-  if (error) {
-    return (
-      <AppShell>
-        <div style={{ textAlign: 'center', padding: '3rem', color: 'red' }}>{error}</div>
-      </AppShell>
-    );
-  }
+  // Safe defaults to prevent null crash on render
+  const safeAging = aging || {
+    '0_30_days': { count: 0, total_amount: 0 },
+    '31_60_days': { count: 0, total_amount: 0 },
+    '60_plus_days': { count: 0, total_amount: 0 },
+  };
 
   // Calculate percentages for aging
-  const totalAgingAmt = aging['0_30_days'].total_amount + aging['31_60_days'].total_amount + aging['60_plus_days'].total_amount;
+  const totalAgingAmt = safeAging['0_30_days'].total_amount + safeAging['31_60_days'].total_amount + safeAging['60_plus_days'].total_amount;
   
   const agingData = [
-    { range: '0 – 30 days', amt: aging['0_30_days'].total_amount, bills: aging['0_30_days'].count, color: '#166534', pct: totalAgingAmt ? (aging['0_30_days'].total_amount / totalAgingAmt) * 100 : 0 },
-    { range: '31 – 60 days', amt: aging['31_60_days'].total_amount, bills: aging['31_60_days'].count, color: '#b45309', pct: totalAgingAmt ? (aging['31_60_days'].total_amount / totalAgingAmt) * 100 : 0 },
-    { range: '61+ days', amt: aging['60_plus_days'].total_amount, bills: aging['60_plus_days'].count, color: '#c0392b', pct: totalAgingAmt ? (aging['60_plus_days'].total_amount / totalAgingAmt) * 100 : 0 },
+    { range: '0 – 30 days', amt: safeAging['0_30_days'].total_amount, bills: safeAging['0_30_days'].count, color: '#166534', pct: totalAgingAmt ? (safeAging['0_30_days'].total_amount / totalAgingAmt) * 100 : 0 },
+    { range: '31 – 60 days', amt: safeAging['31_60_days'].total_amount, bills: safeAging['31_60_days'].count, color: '#b45309', pct: totalAgingAmt ? (safeAging['31_60_days'].total_amount / totalAgingAmt) * 100 : 0 },
+    { range: '61+ days', amt: safeAging['60_plus_days'].total_amount, bills: safeAging['60_plus_days'].count, color: '#c0392b', pct: totalAgingAmt ? (safeAging['60_plus_days'].total_amount / totalAgingAmt) * 100 : 0 },
   ];
 
   // Map collections for Recharts
