@@ -8,7 +8,7 @@ export function CollectionsChart({ data = [] }) {
       <BarChart data={data} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
         <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-2)' }} axisLine={false} tickLine={false} />
-        <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: 'var(--text-2)' }} axisLine={false} tickLine={false} />
+        <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: 'var(--text-2)' }} axisLine={false} tickLine={false} domain={[0, max => Math.max(max, 100000)]} />
         <Tooltip
           formatter={(v) => [`Rs. ${v.toLocaleString('en-IN')}`, 'Collected']}
           contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
