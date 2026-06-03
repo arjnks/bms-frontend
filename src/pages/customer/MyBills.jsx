@@ -255,7 +255,7 @@ export default function MyBills() {
                       <td style={{ fontSize: 13 }}>{b.bill_date}</td>
                       <td style={{ fontWeight: 600 }}>{fmtAmt(b.grand_total)}</td>
                       <td style={{ fontSize: 13 }}>{b.due_date}</td>
-                      <td><StatusBadge status={b.payment_status === 'paid' ? 'paid' : b.status} /></td>
+                      <td><StatusBadge status={b.payment_status === 'unpaid' ? b.status : b.payment_status} /></td>
                       <td>
                         <div className="act-btns">
                           <button className="btn-dl" onClick={() => navigate(`/portal/bills/${b.id}`)}>

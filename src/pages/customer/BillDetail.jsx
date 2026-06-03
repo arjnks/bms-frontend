@@ -107,7 +107,7 @@ export default function BillDetail() {
             <div className="pg-sub">Issued {bill.bill_date} · Due {bill.due_date}</div>
           </div>
           <div className="pg-actions">
-            <StatusBadge status={bill.payment_status === 'paid' ? 'paid' : bill.status} />
+            <StatusBadge status={bill.payment_status === 'unpaid' ? bill.status : bill.payment_status} />
             {(bill.payment_status === 'unpaid' || bill.payment_status === 'proof_rejected') && (
               <button className="btn btn-primary btn-sm" onClick={() => navigate(`/portal/bills/${id}/pay`)}>
                 💳 Submit Payment

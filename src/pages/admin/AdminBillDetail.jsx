@@ -157,7 +157,7 @@ export default function AdminBillDetail() {
           </div>
         </div>
         <div className="pg-actions">
-          <StatusBadge status={bill.payment_status} />
+          <StatusBadge status={bill.payment_status === 'unpaid' ? bill.status : bill.payment_status} />
           <button
             className="btn btn-outline btn-sm"
             onClick={() => setModalOpen(true)}

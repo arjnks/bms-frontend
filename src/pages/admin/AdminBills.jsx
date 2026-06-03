@@ -15,6 +15,9 @@ export default function AdminBills() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sortFilter, setSortFilter] = useState('newest');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState(null);
 
@@ -25,6 +28,9 @@ export default function AdminBills() {
       if (statusFilter !== 'all') {
         params.payment_status = statusFilter;
       }
+      if (sortFilter) params.sort_by = sortFilter;
+      if (fromDate) params.from_date = fromDate;
+      if (toDate) params.to_date = toDate;
       const res = await billsApi.adminList(params);
       setBills(res.data || res);
       setMeta({
@@ -39,7 +45,7 @@ export default function AdminBills() {
     }
   };
 
-  useEffect(() => { load(page); }, [page, statusFilter]);
+  useEffect(() => { load(page); }, [page, statusFilter, sortFilter, fromDate, toDate]);
 
   const filtered = bills.filter(b =>
     b.invoice_no?.toLowerCase().includes(search.toLowerCase()) ||
@@ -90,8 +96,9 @@ export default function AdminBills() {
         <CardHeader
           title="Bill History"
           actions={
-            <div className="toolbar">
+            <div className="toolbar" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <input type="text" placeholder="Search invoice or customer…" value={search} onChange={e => setSearch(e.target.value)} />
+              
               <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}>
                 <option value="all">All status</option>
                 <option value="unpaid">Unpaid</option>
@@ -99,6 +106,19 @@ export default function AdminBills() {
                 <option value="proof_rejected">Proof rejected</option>
                 <option value="paid">Paid</option>
               </select>
+
+              <select value={sortFilter} onChange={e => { setSortFilter(e.target.value); setPage(1); }}>
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="highest_overdue">Highest Overdue ₹</option>
+                <option value="lowest_overdue">Lowest Overdue ₹</option>
+              </select>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <input type="date" value={fromDate} onChange={e => { setFromDate(e.target.value); setPage(1); }} />
+                <span style={{color: 'var(--text-2)'}}>-</span>
+                <input type="date" value={toDate} onChange={e => { setToDate(e.target.value); setPage(1); }} />
+              </div>
             </div>
           }
         />
@@ -144,7 +164,7 @@ export default function AdminBills() {
                     </td>
                     <td style={{ fontSize: 13 }}>{b.bill_date}</td>
                     <td style={{ fontSize: 13 }}>{b.due_date}</td>
-                    <td className={statusColor[b.payment_status] ?? ''} style={{ fontWeight: 600 }}>
+                    <td className={statusColor[b.payment_status === 'unpaid' ? b.status : b.payment_status] ?? ''} style={{ fontWeight: 600 }}>
                       {fmtAmt(b.grand_total)}
                     </td>
                     <td>
@@ -153,7 +173,7 @@ export default function AdminBills() {
                         {b.bill_file_type?.toUpperCase() ?? '-'}
                       </span>
                     </td>
-                    <td><StatusBadge status={b.payment_status} /></td>
+                    <td><StatusBadge status={b.payment_status === 'unpaid' ? b.status : b.payment_status} /></td>
                     <td>
                       <div className="act-btns" onClick={e => e.stopPropagation()}>
                         {b.payment_status === 'payment_submitted' && (
