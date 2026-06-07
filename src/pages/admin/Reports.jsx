@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { AppShell } from '../../components/layout/AppShell';
 import { Card, CardHeader } from '../../components/ui/Card';
 import { reportsApi } from '../../api/reports';
 import { billsApi } from '../../api/bills';
 
-const fmt = (v) => `Rs. ${(v / 100000).toFixed(1)}L`;
+const fmt = (v) => {
+  if (v >= 100000) return `Rs. ${(v / 100000).toFixed(1)}L`;
+  if (v >= 1000) return `Rs. ${(v / 1000).toFixed(1)}k`;
+  return `Rs. ${v}`;
+};
 const formatCurrency = (amt) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amt);
 
 export default function Reports() {
@@ -111,14 +115,20 @@ export default function Reports() {
           </div>
           <div className="chart-wrap">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+              <AreaChart data={chartData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorCollectedRep" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#166534" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#166534" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-2)' }} axisLine={false} tickLine={false} />
                 <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: 'var(--text-2)' }} axisLine={false} tickLine={false} />
                 <Tooltip formatter={(v) => [formatCurrency(v), 'Collected']} contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }} />
                 <Legend formatter={(v) => <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{v}</span>} />
-                <Bar dataKey="collected" name="Collected" fill="#166534" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <Area type="monotone" dataKey="collected" name="Collected" stroke="#166534" strokeWidth={3} fillOpacity={1} fill="url(#colorCollectedRep)" />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>

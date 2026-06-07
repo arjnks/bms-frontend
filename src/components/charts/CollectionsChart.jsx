@@ -1,6 +1,10 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const fmt = (v) => `Rs. ${(v / 100000).toFixed(1)}L`;
+const fmt = (v) => {
+  if (v >= 100000) return `Rs. ${(v / 100000).toFixed(1)}L`;
+  if (v >= 1000) return `Rs. ${(v / 1000).toFixed(1)}k`;
+  return `Rs. ${v}`;
+};
 
 export function CollectionsChart({ data = [] }) {
   return (
