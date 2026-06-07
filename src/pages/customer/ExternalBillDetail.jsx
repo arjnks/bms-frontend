@@ -7,6 +7,7 @@ import { showToast } from '../../components/ui/Toast';
 import { DownloadFormatModal } from '../../components/ui/DownloadFormatModal';
 import { billsApi } from '../../api/bills';
 import { useAuth } from '../../context/AuthContext';
+import { makeAbsoluteDownloadUrl } from '../../utils/url';
 
 const fmtCurrency = (n) => `Rs. ${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -36,7 +37,7 @@ export default function ExternalBillDetail() {
     setDownloadingFormat(selectedFormat);
     try {
       const res = await billsApi.externalGetDownloadUrl(billno, selectedFormat);
-      const url = res.download_url || res.url;
+      let url = makeAbsoluteDownloadUrl(res.download_url || res.url);
       if (url) {
         window.open(url, '_blank');
       } else {

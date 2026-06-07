@@ -145,6 +145,24 @@ export default function Overview() {
   const recentBills    = data.recent_bills   ?? [];
   const topOverdue     = data.top_overdue    ?? [];
 
+  // Normalise chart_collections: overview endpoint returns [{month, collected}]
+  // but CollectionsChart uses dataKey="amount", so remap the key.
+  const collectionsData = (data.chart_collections ?? []).map(c => ({
+    month:  c.month,
+    amount: c.amount ?? c.collected ?? 0,
+  }));
+
+  // Normalise chart_payment_status: overview returns a plain object {paid, due_soon, overdue}
+  // PaymentStatusChart expects [{name, value, color}]
+  const rawStatus = data.chart_payment_status ?? {};
+  const paymentStatusData = Array.isArray(rawStatus)
+    ? rawStatus
+    : [
+        { name: 'Paid',     value: rawStatus.paid     ?? 0, color: '#166534' },
+        { name: 'Due Soon', value: rawStatus.due_soon ?? 0, color: '#b45309' },
+        { name: 'Overdue',  value: rawStatus.overdue  ?? 0, color: '#c0392b' },
+      ];
+
   return (
     <AppShell pendingPayments={0} pendingApprovals={0}>
       <div className="pg-hdr">
@@ -171,8 +189,8 @@ export default function Overview() {
           icon={<svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>} />
         <KpiCard variant="blue" value={(data.bills_today ?? 0).toString()} label="Bills Sent Today" change="Live Data" changeType="up"
           icon={<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>} />
-        <KpiCard variant="amber" value={(data.overdue_count ?? 0).toString()} label="Overdue Bills"
-          change={fmtAmt(overdueAmount)} changeType="dn"
+        <KpiCard variant="amber" value={fmtAmt(overdueAmount)} label="Amount Overdue"
+          change={`${data.overdue_count ?? 0} bills`} changeType="dn"
           icon={<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>} />
         <KpiCard variant="green" value={`${data.collection_rate ?? 0}%`} label="Collection Rate" change="Live Data" changeType="up"
           icon={<svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>} />
@@ -187,11 +205,11 @@ export default function Overview() {
               <option>Last 12 months</option>
             </select>
           </div>
-          <div className="chart-wrap"><CollectionsChart data={data.chart_collections} /></div>
+          <div className="chart-wrap"><CollectionsChart data={collectionsData} /></div>
         </div>
         <div className="chart-card">
           <div className="chart-hdr"><div><div className="chart-title">Payment Status</div><div className="chart-sub">System wide overview</div></div></div>
-          <div className="chart-wrap"><PaymentStatusChart data={data.chart_payment_status} /></div>
+          <div className="chart-wrap"><PaymentStatusChart data={paymentStatusData} /></div>
         </div>
       </div>
 
@@ -201,7 +219,7 @@ export default function Overview() {
         <Card>
           <CardHeader
             title="Recent Activity"
-            actions={<span style={{ fontSize: 12, color: 'var(--text-2)' }}>Live</span>}
+            actions={<span style={{ fontSize: 12, color: 'var(--text-2)' }}>Live (API: {import.meta.env.VITE_API_URL})</span>}
           />
           {recentBills.length === 0 ? (
             <div style={{ padding: '32px 20px', textAlign: 'center', color: 'var(--text-secondary)' }}>

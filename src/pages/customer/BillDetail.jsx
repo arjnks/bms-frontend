@@ -8,16 +8,25 @@ import { showToast } from '../../components/ui/Toast';
 import { DownloadFormatModal } from '../../components/ui/DownloadFormatModal';
 import { billsApi } from '../../api/bills';
 import { useAuth } from '../../context/AuthContext';
+import { makeAbsoluteDownloadUrl } from '../../utils/url';
 
 const lineTotal = (l) => {
-  const qty = parseFloat(l.quantity ?? l.QUANTITY ?? 0) || 0;
-  const rate = parseFloat(l.unit_price ?? l.SRATE ?? 0) || 0;
-  const gst = parseFloat(l.gst_percentage ?? l.GSTRATE ?? 0) || 0;
+  if (l.line_total != null) {
+    const total = parseFloat(l.line_total) || 0;
+    return { base: total, gstAmt: 0, total };
+  }
+  if (l.TOTALAMOUNT != null) {
+    const total = parseFloat(l.TOTALAMOUNT) || 0;
+    return { base: total, gstAmt: 0, total };
+  }
+
+  const qty = getQty(l);
+  const rate = getRate(l);
+  const gst = getGst(l);
   const base = qty * rate;
   return { base, gstAmt: base * gst / 100, total: base + base * gst / 100 };
 };
 
-const getFormat = () => localStorage.getItem('bill_format') || 'excel';
 const getItemName = (l) => l.product_name ?? l.ITEMNAME ?? l.item_name ?? '-';
 const getHsn = (l) => l.hsn_code ?? l.HSNCODE ?? '-';
 const getQty = (l) => parseFloat(l.qty ?? l.quantity ?? l.QUANTITY ?? 0) || 0;
@@ -47,7 +56,7 @@ export default function BillDetail() {
     setDownloadingFormat(selectedFormat);
     try {
       const res = await billsApi.downloadUrl(id, selectedFormat);
-      const url = res.download_url || res.url;
+      const url = makeAbsoluteDownloadUrl(res.download_url || res.url);
       if (url) {
         window.open(url, '_blank');
       } else {

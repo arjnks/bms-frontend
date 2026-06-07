@@ -138,7 +138,7 @@ export default function AdminBills() {
                   <th>Customer</th>
                   <th>Bill Date</th>
                   <th>Due Date</th>
-                  <th>Amount</th>
+                  <th>Due Amount</th>
                   <th>Format</th>
                   <th>Payment Status</th>
                   <th>Actions</th>
@@ -165,7 +165,7 @@ export default function AdminBills() {
                     <td style={{ fontSize: 13 }}>{b.bill_date}</td>
                     <td style={{ fontSize: 13 }}>{b.due_date}</td>
                     <td className={statusColor[b.payment_status === 'unpaid' ? b.status : b.payment_status] ?? ''} style={{ fontWeight: 600 }}>
-                      {fmtAmt(b.grand_total)}
+                      {fmtAmt(Math.max(0, Number(b.grand_total) - Number(b.amount_received || 0)))}
                     </td>
                     <td>
                       <span className={`badge ${b.bill_file_type === 'csv' ? 'b-blue' : 'b-green'}`}

@@ -230,7 +230,7 @@ export default function CustomerDetails() {
                   <th>Invoice No</th>
                   <th>Date</th>
                   <th>Due Date</th>
-                  <th>Amount</th>
+                  <th>Due Amount</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -247,7 +247,9 @@ export default function CustomerDetails() {
                       <td style={{ fontWeight: 500 }}>{b.invoice_no}</td>
                       <td>{b.bill_date ? fmtDate(b.bill_date) : '-'}</td>
                       <td>{b.due_date ? fmtDate(b.due_date) : '-'}</td>
-                      <td style={{ fontWeight: 600 }}>{fmtAmt(b.grand_total)}</td>
+                      <td className={b.payment_status === 'paid' ? 'amt-green' : 'amt-red'}>
+                        {fmtAmt(Math.max(0, Number(b.grand_total) - Number(b.amount_received || 0)))}
+                      </td>
                       <td>
                         <StatusBadge 
                           status={b.payment_status} 

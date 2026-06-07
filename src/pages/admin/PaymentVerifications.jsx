@@ -153,10 +153,11 @@ export default function PaymentVerifications() {
               </div>
               {selected.proof_screenshot ? (
                 <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-                  <a href={`http://localhost:8000/storage/${selected.proof_screenshot}`} target="_blank" rel="noreferrer" style={{ display: 'inline-block', maxWidth: '100%', maxHeight: '400px', overflow: 'hidden', borderRadius: 10, border: '1px solid var(--border)' }}>
-                    <img src={`http://localhost:8000/storage/${selected.proof_screenshot}`} alt="Payment Proof" style={{ display: 'block', maxWidth: '100%', maxHeight: '400px', objectFit: 'contain' }} />
-                  </a>
-                  <div style={{ fontSize: 11, color: 'var(--text-2)', marginTop: 8 }}>Click to view full size</div>
+                  <div style={{ padding: '1rem', background: 'var(--surface-2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-2)' }}>
+                    📎 Screenshot attached · <strong>{selected.proof_screenshot.split('/').pop()}</strong>
+                    <br />
+                    <span style={{ fontSize: 11, marginTop: 4, display: 'block' }}>Open the bill detail page to view the full screenshot with a secure download link.</span>
+                  </div>
                 </div>
               ) : (
                 <div style={{ background: 'var(--gray-4)', border: '2px dashed var(--border)', borderRadius: 10, padding: '2rem', textAlign: 'center', marginBottom: '1.25rem', color: 'var(--text-2)', fontSize: 13 }}>
