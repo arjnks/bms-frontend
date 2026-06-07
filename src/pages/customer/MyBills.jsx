@@ -128,15 +128,21 @@ export default function MyBills() {
     } finally { setExtLoading(false); }
   };
 
-  // Combine local bills + ERP bills for metrics
-  const allBillsForMetrics = [
-    ...bills,
-    ...extBills.map(b => ({
-      bill_date: b.DATE,
-      grand_total: b.NETAMOUNT || 0,
-      payment_status: 'paid', // ERP bills are treated as delivered/paid for metric purposes
-    }))
-  ];
+  // Combine local bills + ERP bills for metrics (with deduplication)
+  const allBillsForMetrics = [...bills];
+  const seenInvoices = new Set(bills.map(b => String(b.invoice_no)));
+  
+  extBills.forEach(b => {
+    const billNo = String(b.billno || b.BILLNO || b.BN);
+    if (!seenInvoices.has(billNo)) {
+      allBillsForMetrics.push({
+        bill_date: b.date || b.DATE,
+        grand_total: b.netamount || b.NETAMOUNT || 0,
+        payment_status: getExtStatus(b), // use the proper helper rather than hardcoding 'paid'
+      });
+      seenInvoices.add(billNo);
+    }
+  });
 
   const outstanding = bills
     .filter(b => b.payment_status === 'unpaid' || b.payment_status === 'proof_rejected')
