@@ -95,9 +95,14 @@ export default function BillDetail() {
   }
 
   const lineItems = bill.line_items ?? bill.lineItems ?? [];
-  const subtotal = Number(bill.subtotal) || lineItems.reduce((s, l) => s + Number(getQty(l)) * Number(getRate(l)), 0);
-  const gstTotal = Number(bill.gst_total) || lineItems.reduce((s, l) => s + Number(getQty(l)) * Number(getRate(l)) * Number(getGst(l)) / 100, 0);
-  const grandTotal = Number(bill.grand_total);
+  
+  const calcSubtotal = lineItems.reduce((s, l) => s + Number(getQty(l)) * Number(getRate(l)), 0);
+  const calcGstTotal = lineItems.reduce((s, l) => s + Number(getQty(l)) * Number(getRate(l)) * Number(getGst(l)) / 100, 0);
+  const calcGrandTotal = lineItems.reduce((s, l) => s + lineTotal(l).total, 0);
+
+  const subtotal = lineItems.length > 0 ? calcSubtotal : (Number(bill.subtotal) || 0);
+  const gstTotal = lineItems.length > 0 ? calcGstTotal : (Number(bill.gst_total) || 0);
+  const grandTotal = lineItems.length > 0 ? calcGrandTotal : (Number(bill.grand_total) || 0);
 
   return (
     <>
