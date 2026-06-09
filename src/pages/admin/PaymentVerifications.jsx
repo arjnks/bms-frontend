@@ -153,11 +153,16 @@ export default function PaymentVerifications() {
               </div>
               {selected.proof_screenshot ? (
                 <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-                  <div style={{ padding: '1rem', background: 'var(--surface-2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-2)' }}>
-                    📎 Screenshot attached · <strong>{selected.proof_screenshot.split('/').pop()}</strong>
-                    <br />
-                    <span style={{ fontSize: 11, marginTop: 4, display: 'block' }}>Open the bill detail page to view the full screenshot with a secure download link.</span>
-                  </div>
+                  <a href={selected.proof_url} target="_blank" rel="noreferrer" style={{ display: 'block', padding: '0.5rem', background: 'var(--surface-2)', borderRadius: 10, border: '1px solid var(--border)', textDecoration: 'none' }}>
+                    {selected.proof_screenshot.endsWith('.pdf') ? (
+                      <div style={{ padding: '2rem', color: 'var(--blue)', fontWeight: 500 }}>
+                        📎 Click to View PDF Document
+                      </div>
+                    ) : (
+                      <img src={selected.proof_url} alt="Payment Proof" style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain', borderRadius: 8 }} />
+                    )}
+                  </a>
+                  <span style={{ fontSize: 11, marginTop: 8, display: 'block', color: 'var(--text-2)' }}>Click the image to view in full size</span>
                 </div>
               ) : (
                 <div style={{ background: 'var(--gray-4)', border: '2px dashed var(--border)', borderRadius: 10, padding: '2rem', textAlign: 'center', marginBottom: '1.25rem', color: 'var(--text-2)', fontSize: 13 }}>
